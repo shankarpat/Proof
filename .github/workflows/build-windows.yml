@@ -1,0 +1,226 @@
+# Builds Proof-Setup.exe on a Windows computer at GitHub and attaches it to your latest release.
+# It runs by itself whenever you upload a new app.html, and you can also start it by hand
+# from the Actions tab (Build Windows installer > Run workflow).
+name: Build Windows installer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - app.html
+      - proof-icon-512.png
+      - .github/workflows/build-windows.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Prepare the desktop app
+        shell: bash
+        run: |
+          set -e
+          mkdir -p desktop/build
+          cp app.html desktop/index.html
+          cp proof-icon-512.png desktop/icon.png
+          cp proof-icon-512.png desktop/build/icon.png
+          cat > desktop/main.js <<'PROOF_EOF'
+          const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, shell, Notification } = require("electron");
+          const path = require("path");
+          const fs = require("fs");
+
+          if (!app.requestSingleInstanceLock()) { app.quit(); }
+          app.setAppUserModelId("app.proof.desktop");
+
+          const settingsFile = () => path.join(app.getPath("userData"), "desktop-settings.json");
+          const DEFAULTS = { runInBackground: false, openAtLogin: false, startHidden: true, trayTipShown: false, reminderOn: false, reminderTime: "19:00", lastReminded: "" };
+          function loadSettings() {
+            try { return Object.assign({}, DEFAULTS, JSON.parse(fs.readFileSync(settingsFile(), "utf8"))); }
+            catch { return { ...DEFAULTS }; }
+          }
+          function saveSettings(s) { try { fs.writeFileSync(settingsFile(), JSON.stringify(s, null, 2)); } catch {} }
+
+          let settings, win = null, tray = null, quitting = false, shownToday = false;
+          const NUDGES = [
+            "Your sky's waiting. One small thing is enough.",
+            "Hi, it's Proof. Want to place a star today?",
+            "Even the tiny version counts today.",
+            "Checking in gently. How are you doing?",
+            "No pressure. Just a reminder that you matter to you.",
+            "A small step, a rest, or something you're proud of. Any of them counts."
+          ];
+          const localDay = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
+          const publicSettings = () => ({ runInBackground: settings.runInBackground, openAtLogin: settings.openAtLogin, startHidden: settings.startHidden, reminderOn: settings.reminderOn, reminderTime: settings.reminderTime });
+          function checkReminder() {
+            if (!settings || !settings.reminderOn) return;
+            const now = new Date(), today = localDay();
+            if (settings.lastReminded === today) return;
+            const [h, m] = (settings.reminderTime || "19:00").split(":").map(Number);
+            if (now.getHours() * 60 + now.getMinutes() < h * 60 + m) return;
+            settings.lastReminded = today; saveSettings(settings);
+            if (shownToday || !Notification.isSupported()) return;
+            const n = new Notification({ title: "Proof", body: NUDGES[Math.floor(Math.random() * NUDGES.length)], icon: iconPath });
+            n.on("click", showWindow); n.show();
+          }
+          const iconPath = path.join(__dirname, "icon.png");
+
+          function applyLoginItem() {
+            if (!app.isPackaged) return;
+            app.setLoginItemSettings({ openAtLogin: settings.openAtLogin, path: process.execPath, args: ["--from-startup"] });
+          }
+
+          function showWindow() {
+            if (!win) createWindow(true);
+            if (win.isMinimized()) win.restore();
+            win.show(); win.focus();
+          }
+
+          function updateTray() {
+            if (settings.runInBackground && !tray) {
+              tray = new Tray(nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 }));
+              tray.setToolTip("Proof");
+              tray.setContextMenu(Menu.buildFromTemplate([
+                { label: "Open Proof", click: showWindow },
+                { type: "separator" },
+                { label: "Quit Proof", click: () => { quitting = true; app.quit(); } }
+              ]));
+              tray.on("click", showWindow);
+            } else if (!settings.runInBackground && tray) {
+              tray.destroy(); tray = null;
+            }
+          }
+
+          function createWindow(show) {
+            win = new BrowserWindow({
+              width: 1040, height: 880, minWidth: 380, minHeight: 520, show: false,
+              title: "Proof", backgroundColor: "#16131F", autoHideMenuBar: true, icon: iconPath,
+              webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false, sandbox: true }
+            });
+            win.loadFile(path.join(__dirname, "index.html"));
+            win.once("ready-to-show", () => { if (show) win.show(); });
+            win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:/.test(url)) shell.openExternal(url); return { action: "deny" }; });
+            win.on("page-title-updated", e => e.preventDefault());
+            win.on("close", e => {
+              if (!quitting && settings.runInBackground) {
+                e.preventDefault(); win.hide();
+                if (!settings.trayTipShown && tray && process.platform === "win32") {
+                  tray.displayBalloon({ title: "Proof is still here", content: "It's resting in the tray by your clock. Click the star to open it again.", iconType: "none" });
+                  settings.trayTipShown = true; saveSettings(settings);
+                }
+              }
+            });
+            win.on("closed", () => { win = null; });
+          }
+
+          ipcMain.on("status:today", (_e, v) => { shownToday = !!v; });
+          ipcMain.handle("settings:get", () => publicSettings());
+          ipcMain.handle("settings:set", (_e, next) => {
+            for (const k of ["runInBackground", "openAtLogin", "startHidden", "reminderOn"]) if (typeof next?.[k] === "boolean") settings[k] = next[k];
+            if (typeof next?.reminderTime === "string" && /^\d{2}:\d{2}$/.test(next.reminderTime) && next.reminderTime !== settings.reminderTime) {
+              settings.reminderTime = next.reminderTime;
+              const [h, m] = next.reminderTime.split(":").map(Number), now = new Date();
+              if (now.getHours() * 60 + now.getMinutes() < h * 60 + m && settings.lastReminded === localDay()) settings.lastReminded = "";
+            }
+            saveSettings(settings); applyLoginItem(); updateTray();
+            return publicSettings();
+          });
+
+          app.on("second-instance", showWindow);
+          app.on("before-quit", () => { quitting = true; });
+          app.whenReady().then(() => {
+            settings = loadSettings();
+            applyLoginItem(); updateTray();
+            const fromStartup = process.argv.includes("--from-startup");
+            const hidden = fromStartup && settings.runInBackground && settings.startHidden;
+            createWindow(!hidden);
+            setInterval(checkReminder, 30 * 1000); setTimeout(checkReminder, 5000);
+          });
+          app.on("window-all-closed", () => { if (!settings.runInBackground || quitting) app.quit(); });
+          PROOF_EOF
+          cat > desktop/preload.js <<'PROOF_EOF'
+          const { contextBridge, ipcRenderer } = require("electron");
+          contextBridge.exposeInMainWorld("proofDesktop", {
+            getSettings: () => ipcRenderer.invoke("settings:get"),
+            setSettings: s => ipcRenderer.invoke("settings:set", s),
+            reportToday: v => ipcRenderer.send("status:today", !!v)
+          });
+          PROOF_EOF
+          cat > desktop/package.json <<'PROOF_EOF'
+          {
+            "name": "proof",
+            "productName": "Proof",
+            "version": "1.1.0",
+            "description": "Proof that you keep showing up for yourself",
+            "author": "Proof",
+            "main": "main.js",
+            "build": {
+              "appId": "app.proof.desktop",
+              "productName": "Proof",
+              "files": [
+                "main.js",
+                "preload.js",
+                "index.html",
+                "icon.png"
+              ],
+              "directories": {
+                "output": "dist",
+                "buildResources": "build"
+              },
+              "win": {
+                "target": [
+                  {
+                    "target": "nsis",
+                    "arch": [
+                      "x64"
+                    ]
+                  }
+                ],
+                "icon": "build/icon.png",
+                "signAndEditExecutable": true
+              },
+              "nsis": {
+                "oneClick": true,
+                "perMachine": false,
+                "createDesktopShortcut": true,
+                "createStartMenuShortcut": true,
+                "shortcutName": "Proof",
+                "runAfterFinish": true,
+                "artifactName": "Proof-Setup.exe",
+                "deleteAppDataOnUninstall": false
+              },
+              "publish": null
+            }
+          }
+          PROOF_EOF
+
+      - name: Build Proof-Setup.exe
+        shell: bash
+        run: |
+          set -e
+          cd desktop
+          npm pkg set version="1.1.${{ github.run_number }}"
+          npm install --no-save --no-audit --no-fund electron@33.2.1 electron-builder@25
+          npx electron-builder --win nsis --x64 --publish never
+
+      - name: Attach it to the latest release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          TAG=$(gh release view --json tagName -q .tagName 2>/dev/null || true)
+          if [ -z "$TAG" ]; then
+            TAG=v1.1
+            gh release create "$TAG" --title "Proof 1.1" --notes "Download Proof-Setup.exe, open it, and Proof installs itself."
+          fi
+          gh release upload "$TAG" desktop/dist/Proof-Setup.exe --clobber
+          echo "Proof-Setup.exe is now attached to release $TAG"
