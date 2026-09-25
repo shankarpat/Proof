@@ -378,6 +378,38 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 .pinrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .pinrow input{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);width:150px;letter-spacing:.2em}
 
+/* Story overlay (Remind Me + Year in Proof) */
+.story{position:fixed;inset:0;z-index:80;background:radial-gradient(120% 90% at 50% 100%,#3A2A5C 0%,#1A1236 45%,#08061A 100%);color:#F5F1FF;overflow:hidden;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 20px calc(18px + env(safe-area-inset-bottom,0px))}
+.story canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.story-top{position:relative;z-index:2;display:flex;align-items:center;gap:12px}
+.story-bars{flex:1;display:flex;gap:4px}
+.story-bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.22);overflow:hidden}
+.story-bars i.on{background:rgba(255,255,255,.9)}
+.story-x{background:rgba(255,255,255,.1);border:0;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;flex:none}
+.story-body{position:relative;z-index:2;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.story-card{max-width:560px;width:100%;padding:8px 4px}
+.story-card.enter{animation:storyIn .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes storyIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.story-card .kick{font-size:15px;color:#E9D9A6;margin:0 0 12px}
+.story-card h2{font-size:clamp(28px,6.5vw,44px);line-height:1.18;color:#fff;margin:0 0 14px;text-wrap:balance}
+.story-card .big{font-family:var(--serif);font-size:clamp(64px,16vw,112px);line-height:1;color:#F6D98B;text-shadow:0 0 40px rgba(246,217,139,.45);margin:4px 0 6px}
+.story-card p{font-size:clamp(18px,4.2vw,22px);line-height:1.5;color:#E4DCF5;margin:0 0 12px;max-width:34ch}
+.story-card q{display:block;font-family:var(--serif);font-size:clamp(21px,5vw,28px);line-height:1.4;color:#fff;quotes:"\201C" "\201D";margin:6px 0 14px;max-width:30ch}
+.story-card .pause{opacity:0;animation:storyIn .8s ease 1.4s both}
+.story-card .row{margin-top:18px;gap:10px}
+.story-card .btn{background:#F6D98B;color:#241B3F}
+.story-card .btn.ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45)}
+.story-card .tn img{border-radius:14px}
+.story-card .tn figcaption{color:#CFC6EA}
+.story-card .tn figcaption b{color:#fff}
+.story-card label.st{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:#CFC6EA;margin-top:18px;cursor:pointer}
+.story-card label.st input{margin-top:4px;accent-color:#F6D98B}
+.story-hint{position:relative;z-index:2;text-align:center;font-size:13px;color:rgba(255,255,255,.55);min-height:18px}
+@media (prefers-reduced-motion: reduce){.story-card.enter,.story-card .pause{animation:none;opacity:1}}
+.remind-btn{background:linear-gradient(135deg,#F6D98B,#F2B5C8)!important;color:#241B3F!important}
+.pastnote-card{background:linear-gradient(160deg,var(--surface),color-mix(in srgb,#F2B5C8 18%,var(--surface)))}
+.pastnote-card textarea{width:100%;min-height:96px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);resize:vertical;line-height:1.55;margin:10px 0 12px}
+
 /* Star shapes */
 .star-preview{background:linear-gradient(180deg,#141030,#2E2352);border-radius:16px;margin:12px 0 4px;padding:6px 0}
 .star-preview svg{display:block;width:100%;max-width:420px;margin:0 auto}
@@ -494,6 +526,7 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
   <button class="d-item" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>Progress</button>
   <button class="d-item" data-tab="reflect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.3 5.7L20 11l-5.7 2.3L12 19l-2.3-5.7L4 11l5.7-2.3z"/></svg>Reflect</button>
   <hr>
+  <button class="d-item" data-act="remind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>Remind me</button>
   <button class="d-item" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
   <p class="d-foot" id="syncState">Saved on this device</p>
 </aside>
@@ -597,7 +630,7 @@ const QUOTES=[
 ];
 
 let S=null;
-const EMPTY=()=>({name:"",categories:[],priorities:[],tasks:[],checkpoints:[],milestones:[],photos:[],myQuotes:[],photoCats:[],wins:[],rests:[],hardDays:{},letters:[],recaps:{},photoPrivacy:{}});
+const EMPTY=()=>({name:"",categories:[],priorities:[],tasks:[],checkpoints:[],milestones:[],photos:[],myQuotes:[],photoCats:[],wins:[],rests:[],hardDays:{},letters:[],recaps:{},photoPrivacy:{},pastNotes:[],remindRecent:[],storySeen:{}});
 S=EMPTY();
 let tab="home",filter="all",bornKey=null,noteFor=null,addingP=false,editingP=null,newColor=COLORS[0],scrollTo=null;
 let msAdding=false,msEditing=null,retryFor=null,photoFilter="all",pending=null,comparing=false,compareSel=[],organizing=false,orgSel=[],editingPhoto=null;
@@ -688,7 +721,7 @@ function newHardPick(){
 function hardPick(){let v=S.hardDays[ymd()];if(v&&typeof v!=="object"){v=S.hardDays[ymd()]=newHardPick();persist()}return v}
 
 function migrate(){
-  for(const k of ["categories","priorities","tasks","checkpoints","milestones","photos","myQuotes","photoCats","wins","rests","letters"])S[k]=S[k]||[];
+  for(const k of ["categories","priorities","tasks","checkpoints","milestones","photos","myQuotes","photoCats","wins","rests","letters","pastNotes","remindRecent"])S[k]=S[k]||[];S.storySeen=S.storySeen||{};
   S.hardDays=S.hardDays||{};S.recaps=S.recaps||{};
   S.photos.forEach(ph=>{if(ph.cat===undefined)ph.cat=null});
   S.settings=S.settings||{skyMode:"time"};
@@ -1049,6 +1082,8 @@ function viewProgress(){
     for(let i=0;i<7;i++){const s=fromIdx(aI+i),e=fromIdx(aI+i+1);const it=comps.filter(c=>c.at>=s&&c.at<e);max=Math.max(max,it.length);cols.push({it,l:new Date(s).toLocaleDateString(undefined,{weekday:"short"}),now:isToday(s)})}
     h+=`<div class="bars">${cols.map(c=>stackCol(c.it,c.l,max,c.now)).join("")}</div>`;
   }else if(unit==="year"){
+    const yr=new Date(a).getFullYear();
+    if(comps.length)h+=`<div class="row" style="margin:-4px 0 14px"><button class="btn remind-btn" data-act="yearstory" data-id="${yr}">✦ Watch your ${yr} in Proof</button></div>`;
     const cols=[];let max=1;const y=new Date(a).getFullYear();
     for(let m=0;m<12;m++){const s=new Date(y,m,1).getTime(),e=new Date(y,m+1,1).getTime();const it=comps.filter(c=>c.at>=s&&c.at<e);max=Math.max(max,it.length);cols.push({it,l:new Date(s).toLocaleDateString(undefined,{month:"narrow"}),now:s<=now&&now<e})}
     h+=`<div class="bars">${cols.map(c=>stackCol(c.it,c.l,max,c.now)).join("")}</div>`;
@@ -1104,8 +1139,8 @@ function viewHome(){
   const list=[...main,...doneNow];
   const total=list.length, done=doneNow.length, pct=total?Math.round(done/total*100):0;
   let h=`<h2>Today</h2><p class="lede">Your steps reset every morning. Check things off as you go.</p>${lettersCard()}${checkins()}${recapCard()}${showUp()}
-    <div class="hard-link"><button class="btn quiet" data-act="win">I'm proud of…</button><button class="btn ghost" data-act="hardon">Having a hard day?</button><button class="btn ghost" data-act="yesterday">Log a past day</button></div>
-    ${onThisDay()}${statStrip()}${filters()}`;
+    <div class="hard-link"><button class="btn remind-btn" data-act="remind">✦ Remind me</button><button class="btn quiet" data-act="win">I'm proud of…</button><button class="btn ghost" data-act="hardon">Having a hard day?</button><button class="btn ghost" data-act="yesterday">Log a past day</button></div>
+    ${yearCard()}${pastNoteAsk()}${onThisDay()}${statStrip()}${filters()}`;
   if(!list.length&&!more.length){
     h+=`<div class="empty"><p>No steps here yet. Add a few things you usually do under your priorities, marked as regular, and they'll show up here every day.</p><button class="btn quiet" data-act="goto" data-tab="priorities">Add steps</button></div>`;
   }else{
@@ -1185,7 +1220,8 @@ function viewCheckpoints(){
     ["letters","Letters",S.letters.length?(readyLetters?`${readyLetters} ready`:S.letters.length):null],
     ["proud","Proud moments",S.wins.length||null],
     ["sunday","Sunday notes",rc.length||null],
-    ["quotes","My quotes",S.myQuotes.length||null]];
+    ["quotes","My quotes",S.myQuotes.length||null],
+    ["notes","For hard nights",S.pastNotes.length||null]];
   if(!secs.some(x=>x[0]===reflectSec))reflectSec="checkpoint";
   let h=`<h2>Reflect</h2><p class="lede">A quiet place to look back, write to yourself, and keep what matters.</p>
     <div class="rnav" role="group" aria-label="Reflect sections">${secs.map(([k,l,n])=>`<button data-act="rsec" data-id="${k}" aria-pressed="${reflectSec===k}">${l}${n?`<span>${n}</span>`:""}</button>`).join("")}</div>`;
@@ -1215,6 +1251,10 @@ function viewCheckpoints(){
       :`<div class="empty"><p>Every Sunday, Home shows a short recap of your week with one question. Your answers are kept here.</p></div>`;
   }else if(reflectSec==="quotes"){
     h+=quotesSection();
+  }else if(reflectSec==="notes"){
+    h+=`<div class="card pastnote-card"><strong>Leave something for the version of you who wants to give up</strong><p class="t-sub" style="margin:4px 0 0">Remind Me will show it to you on a hard night. Only you will ever see it.</p>
+      <form data-form="pastnote"><textarea name="text" required maxlength="1200" placeholder="I know you feel like you're back at square one. You're not. Remember how hard this used to feel? Look at you now. Just go once."></textarea><button class="btn" type="submit">Save this note</button></form></div>`;
+    h+=S.pastNotes.length?`<div class="card"><ul class="wins-list">${[...S.pastNotes].reverse().map(n=>`<li><small>Written ${fmtDate(n.at)}</small>${esc(n.text)} <button class="icon-btn" data-act="delpastnote" data-id="${n.id}" aria-label="Remove note">\u00d7</button></li>`).join("")}</ul></div>`:"";
   }
   return h;
 }
@@ -1439,7 +1479,7 @@ function hardHome(){
   const one=pool.filter(t=>!doneToday(t)&&dueToday(t)).map(t=>({t,s:score(t)+(t.tiny?20:0)})).sort((a,b)=>b.s-a.s)[0]?.t;
   const rested=S.rests.some(r=>isToday(r.at));
   let h=lettersCard()+`<div class="hard"><h2>Today is a hard day.</h2><p>${esc(HARD_MSGS[hardPick().m]||HARD_MSGS[0])}</p>
-    <div class="row"><button class="btn" data-act="rest" ${rested?"disabled":""}>${rested?"Rest counted. Be gentle with you.":"Rest counts today"}</button><button class="btn ghost" data-act="win">I'm proud of\u2026</button></div></div>`;
+    <div class="row"><button class="btn" data-act="rest" ${rested?"disabled":""}>${rested?"Rest counted. Be gentle with you.":"Rest counts today"}</button><button class="btn ghost" data-act="win">I'm proud of\u2026</button><button class="btn ghost" data-act="remind" data-id="hard">✦ Remind me</button></div></div>`;
   if(one)h+=`<div class="today-card"><div class="list-head"><strong>If you'd like, just one small thing</strong></div><ul class="tasks">${taskRow(one,{home:true,hard:true})}</ul></div>`;
   if(doneT.length)h+=`<p class="soon" style="margin-top:12px">Already today: ${doneT.map(t=>esc(t.title)).join(", ")}. Look at you.</p>`;
   h+=evidence();
@@ -1518,6 +1558,207 @@ function recapCard(){
     <form data-form="recap" data-key="${key}"><input type="hidden" name="q" value="${esc(q)}"><label class="field"><span>${esc(q)}</span><textarea name="a" placeholder="Optional"></textarea></label>
     <div class="row"><button class="btn" type="submit">Save and close</button><button class="btn ghost" type="button" data-act="closerecap" data-id="${key}">Close</button></div></form></div>`;
 }
+
+/* ---------- evidence (shared by Remind Me and Year in Proof) ---------- */
+function evidenceCtx(fromI=-1e9,toI=1e9){
+  const comps=allCompletions().filter(c=>P(c.t.pid)&&dIdx(c.at)>=fromI&&dIdx(c.at)<toI).sort((a,b)=>a.at-b.at);
+  const all=shownDays(),days=[...all].filter(i=>i>=fromI&&i<toI).sort((a,b)=>a-b),today=dIdx(Date.now());
+  const byTask={},byP={};comps.forEach(c=>{byTask[c.t.id]=(byTask[c.t.id]||0)+1;byP[c.t.pid]=(byP[c.t.pid]||0)+1});
+  const gaps=[];for(let k=1;k<days.length;k++){const g=days[k]-days[k-1]-1;if(g>0)gaps.push({g,ret:fromIdx(days[k])})}
+  const longest=gaps.reduce((m,x)=>x.g>(m?m.g:0)?x:m,null);
+  const inR=t=>dIdx(t)>=fromI&&dIdx(t)<toI;
+  return {comps,total:comps.length,days,today,daysSinceLast:days.length?today-days[days.length-1]:null,gaps,longest,comebacks:gaps.length,
+    byTask:Object.entries(byTask).map(([id,n])=>({t:T(id),n})).filter(x=>x.t).sort((a,b)=>b.n-a.n),
+    byP:Object.entries(byP).map(([id,n])=>({p:P(id),n})).filter(x=>x.p).sort((a,b)=>b.n-a.n),
+    notes:comps.filter(c=>c.note&&!isToday(c.at)),tiny:comps.filter(c=>c.tiny),
+    wins:S.wins.filter(w=>inR(w.at)),rests:S.rests.filter(r=>inR(r.at)),
+    msWon:S.milestones.filter(m=>m.status==="achieved"&&m.achievedAt&&inR(m.achievedAt)),
+    retries:S.milestones.reduce((n,m)=>n+m.attempts.filter(a=>a.outcome==="retry"&&inR(a.at)).length,0),
+    proved:S.checkpoints.filter(c=>c.proved&&inR(c.date)),
+    first:comps[0]||null};
+}
+const pickOne=a=>a.length?a[Math.floor(Math.random()*a.length)]:null;
+const times=n=>n===1?"once":n===2?"twice":n+" times";
+function storyPhotos(){
+  if(!(S.settings&&S.settings.storyPhotos))return null;
+  const vis=S.photos.filter(ph=>photoPriv(ph)==="visible").sort((a,b)=>a.date<b.date?-1:1);
+  const byCat={};vis.forEach(ph=>{(byCat[ph.cat||"_"]=byCat[ph.cat||"_"]||[]).push(ph)});
+  const pairs=Object.values(byCat).filter(l=>l.length>=2&&dIdx(parseYmd(l[l.length-1].date))-dIdx(parseYmd(l[0].date))>=14).map(l=>[l[0],l[l.length-1]]);
+  return pickOne(pairs);
+}
+function photoPairHTML(pair){return `<div class="tn">${pair.map(ph=>`<figure>${img(ph)}<figcaption><b>${fmtYmd(ph.date)}</b></figcaption></figure>`).join("")}</div>`}
+
+/* ---------- Remind Me: a small rules engine, no AI ---------- */
+function remindModules(x,mode){
+  const M=[],add=(key,w,html)=>{if(w>0)M.push({key,w,html})};
+  const recentN=x.days.filter(i=>x.today-i<60).length;
+  const away=x.daysSinceLast!=null&&x.daysSinceLast>=3;
+  if(mode==="hard"){
+    const small=x.tiny.length?pickOne(x.tiny):x.comps.length?[...x.comps].sort((a,b)=>(a.t.tiny||a.t.title).length-(b.t.tiny||b.t.title).length)[Math.floor(Math.random()*Math.min(3,x.comps.length))]:null;
+    if(small)add("small:"+small.key,9,`<p class="kick">Remember ${fmtDate(small.at)}?</p><p>Your promise was just:</p><q>${esc(small.tiny&&small.t.tiny?small.t.tiny:small.t.title)}</q><p>You did it.</p><p class="pause">That counted then. It counts now.</p>`);
+    if(x.rests.length)add("rest",6,`<h2>You've let rest count ${times(x.rests.length)}.</h2><p>Resting was never giving up. It was taking care of the person who keeps showing up.</p>`);
+    if(x.comebacks)add("cb-soft",6,`<h2>You've been here before.</h2><p>And you came back ${times(x.comebacks)}.</p><p class="pause">There's no rush this time either.</p>`);
+    const w=pickOne(x.wins);if(w)add("win:"+w.id,5,`<p class="kick">On ${fmtDate(w.at)}, you were proud of this:</p><q>${esc(w.text)}</q>`);
+    if(x.total&&x.total<25)add("few",4,`<h2>${x.total} times, you kept a promise to yourself.</h2><p>None of them needed to be big. They all still count.</p>`);
+    return M;
+  }
+  if(away&&x.comebacks)add("away",9,`<h2>It's been ${x.daysSinceLast} days.</h2><p>You've been away before, and every time, you came back.</p><p class="pause">That return becomes part of your story too.</p>`);
+  if(x.total>=10)add("total",x.total>=100?6:4,`<p class="kick">Look at your sky.</p><div class="big">${x.total}</div><p>promises kept.</p><p class="pause">That's ${x.total} moments where you could have done something else, and chose to show up. They're still here.</p>`);
+  if(x.total>0&&x.total<10)add("early",7,`<h2>You don't need hundreds of stars for them to matter.</h2><p>You've shown up for yourself ${times(x.total)}.</p><p class="pause">Those moments are real. Let's make it ${x.total+1}.</p>`);
+  const bp=pickOne(x.byP.filter(y=>y.n>=2&&y.p.belief).slice(0,3));
+  if(bp)add("p:"+bp.p.id,6,`<p class="kick">You said you're someone who</p><h2>${esc(bp.p.belief)}.</h2><p>You've kept that promise ${times(bp.n)}.</p>`);
+  const bt=pickOne(x.byTask.filter(y=>y.n>=2).slice(0,4));
+  if(bt)add("t:"+bt.t.id,4,`<p class="kick">You said this mattered to you:</p><q>${esc(bt.t.title)}</q><p>You've done it ${times(bt.n)}.</p>`);
+  if(x.longest&&x.longest.g>=3)add("longest",away?7:5,`<h2>You once went ${x.longest.g} days without checking anything off.</h2><p class="pause">Then, on ${fmtDate(x.longest.ret)}, you came back.</p>`);
+  if(x.comebacks>=2&&!away)add("cbcount",4,`<h2>You've come back ${times(x.comebacks)}.</h2><p>You can always come back again.</p>`);
+  const n=pickOne(x.notes);if(n)add("note:"+n.key,6,`<p class="kick">On ${fmtDate(n.at)}, after “${esc(n.t.title)}”, you wrote:</p><q>${esc(n.note)}</q>`);
+  const w=pickOne(x.wins);if(w)add("win:"+w.id,6,`<p class="kick">On ${fmtDate(w.at)}, you were proud of this:</p><q>${esc(w.text)}</q>`);
+  const cp=pickOne(x.proved);if(cp)add("cp:"+cp.id,4,`<p class="kick">You once wrote what you'd proved to yourself:</p><q>${esc(cp.proved)}</q>`);
+  const ms=pickOne(x.msWon);if(ms){const k=ms.attempts.length;add("ms:"+ms.id,6,`<p class="kick">Milestone reached</p><h2>${esc(ms.title)}</h2><p>${k>1?`It took ${k} attempts, and you never stopped trying.`:"You said you would, and you did."}</p>`)}
+  if(x.retries)add("retry",4,`<h2>${x.retries===1?"Once":x.retries+" times"}, a goal didn't happen on time.</h2><p>And you chose a new date instead of quitting.</p>`);
+  if(recentN>=10&&!away)add("recent",3,`<h2>Sometimes progress becomes so normal you stop noticing it.</h2><p>You've shown up on ${recentN} of the last 60 days.</p><p class="pause">Take a second and look at what you've built.</p>`);
+  if(x.first&&x.today-dIdx(x.first.at)>=14)add("first",3,`<p class="kick">Your very first star</p><h2>${fmtDate(x.first.at)}</h2><q>${esc(x.first.t.title)}</q><p>Look at everything that came after it.</p>`);
+  const ya=x.comps.filter(c=>{const d=x.today-dIdx(c.at);return d>=355&&d<=375});
+  if(ya.length)add("yearago",6,`<p class="kick">A year ago</p><h2>You were already trying.</h2><p>${esc([...new Set(ya.map(c=>c.t.title))].slice(0,3).join(", "))}.</p><p class="pause">Look how far you've come since.</p>`);
+  if(x.tiny.length)add("tiny",3,`<h2>${x.tiny.length===1?"Once":x.tiny.length+" times"}, you did the tiny version on a low day.</h2><p>Those stars shine exactly as bright.</p>`);
+  const pair=storyPhotos();if(pair)add("photo:"+pair[0].id,4,`<p class="kick">Then and now</p>${photoPairHTML(pair)}<p>${plural(dIdx(parseYmd(pair[1].date))-dIdx(parseYmd(pair[0].date)),"day")} between these.</p>`);
+  return M;
+}
+function buildRemind(mode){
+  const x=evidenceCtx(),recent=new Set(S.remindRecent.flat()),slides=[];
+  const hasAny=x.total||S.wins.length;
+  if(!hasAny){
+    slides.push({stars:0,html:`<h2>Your sky is still waiting for its first star.</h2><p>That's okay. Every constellation starts with one.</p><div class="row"><button class="btn" data-act="story-promise">Make a small promise</button></div>`});
+    return {slides,used:[]};
+  }
+  const away=x.daysSinceLast!=null&&x.daysSinceLast>=3;
+  slides.push({stars:.15,html:mode==="hard"?pickOne([`<h2>You don't need to have a great day.</h2><p>Let's just look at a few small things you've already done.</p>`,`<h2>Today can be small.</h2><p>Here are some small things that already counted.</p>`])
+    :away?`<h2>You feel behind right now.</h2><p class="pause">But you've been here before.</p>`
+    :pickOne([`<h2>You asked for a reminder.</h2><p>So here's what you've actually done.</p>`,`<h2>Don't take anyone's word for it.</h2><p>Look at the evidence you created.</p>`])});
+  let mods=remindModules(x,mode);
+  let fresh=mods.filter(m=>!recent.has(m.key));if(fresh.length<2)fresh=mods;
+  const chosen=[];const want=mode==="hard"?3:4;
+  while(chosen.length<want&&fresh.length){let r=Math.random()*fresh.reduce((s,m)=>s+m.w,0),i=0;for(;i<fresh.length-1;i++){r-=fresh[i].w;if(r<=0)break}chosen.push(fresh[i]);fresh.splice(i,1)}
+  chosen.forEach((m,i)=>slides.push({stars:.3+.5*(i+1)/chosen.length,html:m.html}));
+  const notes=S.pastNotes.filter(n=>!recent.has("pn:"+n.id));const pn=pickOne(notes.length?notes:S.pastNotes);
+  const used=chosen.map(m=>m.key);
+  if(pn){slides.push({stars:.85,html:`<p class="kick">Past you wanted you to remember something.</p><q>${esc(pn.text)}</q><p class="t-sub" style="color:#CFC6EA">Written ${fmtDate(pn.at)}</p>`});used.push("pn:"+pn.id)}
+  const photoToggle=S.photos.some(ph=>photoPriv(ph)==="visible")?`<label class="st"><input type="checkbox" data-act="storyphotos" ${S.settings&&S.settings.storyPhotos?"checked":""}>Include my visible photos in reminders and stories</label>`:"";
+  slides.push({stars:1,html:mode==="hard"
+    ?`<h2>Just one small thing, or nothing at all.</h2><p>Both are allowed today.</p><div class="row"><button class="btn" data-act="story-smaller">Make today's promise smaller</button><button class="btn ghost" data-act="story-close">Close</button></div>${photoToggle}`
+    :`<h2>${x.total?`You've already given yourself ${x.total} ${x.total===1?"reason":"reasons"} to believe you can show up again.`:"You've already shown yourself you can."}</h2><p class="pause">You don't have to fix everything today. Just make one small promise.</p><div class="row"><button class="btn" data-act="story-promise">Make a small promise</button><button class="btn ghost" data-act="story-close">Close</button></div>${photoToggle}`});
+  return {slides,used};
+}
+function openRemind(start){
+  const chooser={stars:.08,html:`<p class="kick">Remind me</p><h2>What do you need right now?</h2><div class="row" style="flex-direction:column;align-items:flex-start"><button class="btn" data-act="story-mode" data-id="normal">Show me what I've done</button><button class="btn ghost" data-act="story-mode" data-id="hard">I'm having a really hard day</button></div>`};
+  if(start==="hard"||isHard()){startRemind("hard");return}
+  openStory([chooser],{label:"Remind me",noNav:true});
+}
+function startRemind(mode){
+  const {slides,used}=buildRemind(mode);
+  S.remindRecent=[...S.remindRecent,used].slice(-3);persist();
+  openStory(slides,{label:"Remind me",starsAll:true});
+}
+
+/* ---------- Year in Proof ---------- */
+function buildYear(yr){
+  const a=dIdx(new Date(yr,0,1).getTime()),b=dIdx(new Date(yr+1,0,1).getTime()),x=evidenceCtx(a,b),slides=[],now=dIdx(Date.now()),ongoing=now<b;
+  if(!x.total&&!x.wins.length)return null;
+  slides.push({stars:0,html:`<p class="kick">Your ${yr} in Proof</p><h2 style="font-size:clamp(40px,10vw,68px)">This was your year.</h2>`});
+  if(x.first)slides.push({stars:"first",html:`<p class="kick">It started on ${new Date(x.first.at).toLocaleDateString(undefined,{month:"long",day:"numeric"})}.</p><h2>You made yourself a promise.</h2><q>${esc(x.first.t.title)}</q>`});
+  if(x.total)slides.push({stars:.55,html:x.total>=25?`<p class="kick">This year</p><div class="big">${x.total}</div><p>times, you showed up for yourself.</p>`
+    :`<h2>${x.total} ${x.total===1?"time":"times"} this year, you made a promise to yourself and kept it.</h2><p class="pause">${x.total===1?"That time happened":"Those "+x.total+" times happened"}. Nothing can take ${x.total===1?"it":"them"} away.</p>`});
+  if(x.days.length){const end=Math.min(b,now+1),span=end-x.days[0],quiet=span-x.days.length;
+    if(quiet>0)slides.push({stars:.55,html:`<h2>There were ${quiet} ${quiet===1?"day":"days"} when you didn't check anything off.</h2><p class="pause">And none of them erased the days you did.</p>`})}
+  const top=x.byTask[0];if(top&&top.n>=2)slides.push({stars:.65,html:`<p class="kick">The promise you kept most</p><q>${esc(top.t.title)}</q><p>${times(top.n)[0].toUpperCase()+times(top.n).slice(1)}.</p>`});
+  const small=x.tiny.length?x.tiny[0]:x.comps.length>2?[...x.comps].sort((m,n)=>m.t.title.length-n.t.title.length)[0]:null;
+  if(small)slides.push({stars:.7,html:`<p class="kick">Your smallest promise</p><q>${esc(small.tiny&&small.t.tiny?small.t.tiny:small.t.title)}</q><p>You kept it anyway. Small promises built this whole sky.</p>`});
+  if(x.longest&&x.longest.g>=3)slides.push({stars:.75,html:`<h2>Once, ${x.longest.g} days went by.</h2><p class="pause">And then you came back.${x.comebacks>1?` You came back ${times(x.comebacks)} this year.`:""}</p>`});
+  if(x.wins.length)slides.push({stars:.8,html:`<p class="kick">Things you were proud of</p>${x.wins.slice(-3).map(w=>`<q style="font-size:clamp(18px,4.4vw,23px);margin:4px 0 10px">${esc(w.text)}</q>`).join("")}`});
+  if(x.msWon.length||x.retries)slides.push({stars:.85,html:x.msWon.length?`<p class="kick">Milestones</p><h2>You reached ${x.msWon.length===1?"“"+esc(x.msWon[0].title)+"”":x.msWon.length+" milestones"}.</h2>${x.retries?`<p>And ${x.retries===1?"once":x.retries+" times"} you chose a new date instead of giving up.</p>`:""}`
+    :`<h2>${x.retries===1?"Once":x.retries+" times"} this year, a goal didn't happen on time.</h2><p>And you chose a new date instead of giving up.</p>`});
+  const cp=x.proved[x.proved.length-1]||x.notes[x.notes.length-1];
+  if(cp)slides.push({stars:.9,html:`<p class="kick">In your own words, ${fmtDate(cp.date||cp.at)}</p><q>${esc(cp.proved||cp.note)}</q>`});
+  const pair=storyPhotos();if(pair)slides.push({stars:.9,html:`<p class="kick">You chose to keep these</p>${photoPairHTML(pair)}`});
+  slides.push({stars:"year",html:`<p class="kick">${x.total?`You showed up for yourself ${times(x.total)}.`:"You showed up for yourself."}</p><h2 style="font-size:clamp(40px,10vw,64px)">Here is the proof.</h2>`});
+  slides.push({stars:"year",html:ongoing?`<h2>The year isn't over.</h2><p>Every star from here on is part of it too. See you tomorrow.</p><div class="row"><button class="btn" data-act="story-close">Close</button></div>`
+    :`<h2>See you next year.</h2><div class="row"><button class="btn" data-act="story-close">Close</button></div>`});
+  return {slides,range:[a,b]};
+}
+function openYear(yr){const y=buildYear(yr);if(!y){toast(`Your ${yr} story will appear once you've placed a star that year.`);return}
+  S.storySeen["y"+yr]=true;persist();openStory(y.slides,{label:`Your ${yr} in Proof`,range:y.range})}
+function yearCard(){
+  const d=new Date(),m=d.getMonth();if(m!==11&&m!==0)return "";
+  const yr=m===11?d.getFullYear():d.getFullYear()-1;if(S.storySeen["y"+yr])return "";
+  const a=dIdx(new Date(yr,0,1).getTime()),b=dIdx(new Date(yr+1,0,1).getTime());
+  if(!allCompletions().some(c=>dIdx(c.at)>=a&&dIdx(c.at)<b))return "";
+  return `<div class="letter-ready"><span aria-hidden="true">✦</span><div><h3>Your ${yr} in Proof is ready</h3><p>A look back at every time you showed up for yourself.</p></div><button class="btn" data-act="yearstory" data-id="${yr}">Watch it</button></div>`;
+}
+function pastNoteAsk(){
+  const sd=shownDays(),t=dIdx(Date.now());let n=0;for(let i=0;i<7;i++)if(sd.has(t-i))n++;
+  const last=S.pastNotes.length?S.pastNotes[S.pastNotes.length-1].at:0,snooze=S.settings&&S.settings.noteAskSnooze||0;
+  if(n<4||isHard()||Date.now()-last<30*DAY||Date.now()<snooze)return "";
+  return `<div class="card pastnote-card"><strong>You're doing well. Leave something for the version of you who wants to give up.</strong><p class="t-sub" style="margin:4px 0 0">Remind Me will show it to you on a hard night.</p>
+    <form data-form="pastnote"><textarea name="text" required maxlength="1200" placeholder="I know you feel like you're back at square one. You're not. Remember how hard this used to feel? Look at you now."></textarea><div class="row"><button class="btn" type="submit">Save for later</button><button class="btn ghost" type="button" data-act="noteasklater">Not now</button></div></form></div>`;
+}
+
+/* ---------- story player ---------- */
+let story=null;
+function openStory(slides,opt={}){
+  closeStory(true);
+  const el=document.createElement("div");el.className="story";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label",opt.label||"Story");
+  el.innerHTML=`<canvas aria-hidden="true"></canvas><div class="story-top"><div class="story-bars">${opt.noNav?"":slides.map(()=>"<i></i>").join("")}</div><button class="story-x" data-act="story-close" aria-label="Close">×</button></div><div class="story-body"><div class="story-card" aria-live="polite"></div></div><div class="story-hint"></div>`;
+  document.body.appendChild(el);document.body.style.overflow="hidden";
+  story={el,slides,i:0,opt,shown:0,target:0,prev:document.activeElement,stars:storyStars(opt.range),raf:null,t0:performance.now()};
+  sizeStory();showSlide(0);el.querySelector(".story-x").focus();drawStoryLoop();
+}
+function closeStory(silent){if(!story)return;cancelAnimationFrame(story.raf);story.el.remove();document.body.style.overflow="";const pv=story.prev;story=null;if(!silent){render();pv&&pv.focus&&pv.focus()}}
+function showSlide(i){
+  const st=story;st.i=Math.max(0,Math.min(st.slides.length-1,i));const sl=st.slides[st.i];
+  const card=st.el.querySelector(".story-card");card.classList.remove("enter");void card.offsetWidth;card.innerHTML=sl.html;card.classList.add("enter");
+  st.el.querySelectorAll(".story-bars i").forEach((b,k)=>b.classList.toggle("on",k<=st.i));
+  st.mode=sl.stars;st.target=sl.stars==="first"?1:sl.stars==="year"||sl.stars===1?st.stars.length:Math.round(st.stars.length*(+sl.stars||0));
+  if(sl.stars==="first")st.shown=Math.min(st.shown,1);
+  st.el.querySelector(".story-hint").textContent=st.opt.noNav||st.i===st.slides.length-1?"":st.i===0?"Tap to continue":"";
+}
+function storyStars(range){
+  let cs=allCompletions().filter(c=>P(c.t.pid));if(range)cs=cs.filter(c=>dIdx(c.at)>=range[0]&&dIdx(c.at)<range[1]);
+  return cs.sort((a,b)=>a.at-b.at).map(c=>({key:c.key,pid:c.t.pid,col:P(c.t.pid).color,tiny:c.tiny}));
+}
+function sizeStory(){if(!story)return;const c=story.el.querySelector("canvas"),d=Math.min(2,devicePixelRatio||1);story.W=innerWidth;story.H=innerHeight;c.width=story.W*d;c.height=story.H*d;c.getContext("2d").setTransform(d,0,0,d,0,0);
+  const W=story.W,H=story.H,byP={};story.stars.forEach(s=>{(byP[s.pid]=byP[s.pid]||[]).push(s)});
+  Object.keys(byP).forEach((pid,gi)=>{const cx=W*(.18+rnd("sx"+pid)*.64),cy=H*(.12+rnd("sy"+pid)*.3),spread=Math.min(W,H)*.2;
+    byP[pid].forEach(s=>{const a=rnd("a"+s.key)*Math.PI*2,r=Math.sqrt(rnd("d"+s.key))*spread;s.x=Math.max(8,Math.min(W-8,cx+Math.cos(a)*r*1.3));s.y=Math.max(8,Math.min(H*.55,cy+Math.sin(a)*r*.8))})});
+  story.groups=byP;
+}
+function drawStoryLoop(){
+  const st=story;if(!st)return;const c=st.el.querySelector("canvas"),x=c.getContext("2d"),W=st.W,H=st.H,t=(performance.now()-st.t0)/1000,reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduce)st.shown=st.target;else if(st.shown<st.target)st.shown=Math.min(st.target,st.shown+Math.max(.25,st.target/90));else if(st.shown>st.target)st.shown=st.target;
+  x.clearRect(0,0,W,H);
+  for(let i=0;i<70;i++){x.globalAlpha=.12+.25*rnd("sd"+i)*(reduce?1:.75+.25*Math.sin(t+i));x.fillStyle="#fff";x.beginPath();x.arc(rnd("sdx"+i)*W,rnd("sdy"+i)*H*.8,.4+rnd("sdr"+i)*.9,0,7);x.fill()}
+  const n=Math.floor(st.shown),vis=st.stars.slice(0,n),set=new Set(vis);
+  if(st.mode==="year"||st.mode===1){Object.values(st.groups||{}).forEach(g=>{const l=g.filter(s=>set.has(s)).slice(-40);if(l.length<2)return;x.globalAlpha=.22;x.strokeStyle=l[0].col;x.lineWidth=1;x.beginPath();l.forEach((s,k)=>k?x.lineTo(s.x,s.y):x.moveTo(s.x,s.y));x.stroke()})}
+  const big=st.mode==="first";
+  vis.forEach((s,k)=>{const r=big?9:s.tiny?1.8:2.5;x.globalAlpha=.3;x.fillStyle=s.col;x.beginPath();x.arc(s.x,s.y,r*3.2,0,7);x.fill();x.globalAlpha=reduce?1:.8+.2*Math.sin(t*1.6+k);x.beginPath();x.arc(s.x,s.y,r,0,7);x.fill()});
+  x.globalAlpha=1;st.raf=requestAnimationFrame(drawStoryLoop);
+}
+function storyClick(e){
+  if(!story||!e.target.closest(".story"))return false;
+  const b=e.target.closest("[data-act]");
+  if(b){const a=b.dataset.act;
+    if(a==="story-close"){closeStory();return true}
+    if(a==="story-mode"){startRemind(b.dataset.id);return true}
+    if(a==="story-promise"){closeStory(true);if(!S.priorities.length){addingP=true;goTab("priorities")}else{goTab("priorities");setTimeout(()=>{const f=document.querySelector(".addstep");if(f){f.classList.add("open");f.scrollIntoView({block:"center"});f.elements.t.focus()}},60)}return true}
+    if(a==="story-smaller"){closeStory(true);if(!isHard())S.hardDays[ymd()]=newHardPick();persist();goTab("home");toast("Okay. Today we go gently.");return true}
+    if(a==="storyphotos"){S.settings=Object.assign({},S.settings,{storyPhotos:b.checked});persist();toast(b.checked?"Your visible photos can appear in reminders now.":"Photos won't appear in reminders.");return true}
+    return true}
+  if(e.target.closest("button,a,input,textarea,label"))return true;
+  if(story.opt.noNav)return true;
+  const back=e.clientX<innerWidth*.28;
+  if(back)showSlide(story.i-1);else if(story.i<story.slides.length-1)showSlide(story.i+1);
+  return true;
+}
+addEventListener("resize",()=>{if(story)sizeStory()});
 
 /* ---------- settings ---------- */
 function viewSettings(){
@@ -1619,6 +1860,7 @@ function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show"
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)goTab(b.dataset.tab)});
 $("#drawer").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b){closeMenu();goTab(b.dataset.tab)}});
 
+document.addEventListener("click",e=>{if(story&&storyClick(e)){e.stopImmediatePropagation()}},true);
 document.addEventListener("click",async e=>{
   const b=e.target.closest("[data-act]");if(!b)return;
   const id=b.dataset.id,act=b.dataset.act;
@@ -1647,6 +1889,10 @@ document.addEventListener("click",async e=>{
   if(act==="rest"){if(!S.rests.some(r=>isToday(r.at))){const before=shownDays().has(dIdx(Date.now()));S.rests.push({at:Date.now()});if(!before&&isComebackToday())shootNext=true;persist()}render();toast("Rest counts. You showed up for yourself today.");return}
   if(act==="win"){openWinForm();return}
   if(act==="rsec"){reflectSec=id;render();return}
+  if(act==="remind"){closeMenu();openRemind(id);return}
+  if(act==="yearstory"){openYear(+id);return}
+  if(act==="noteasklater"){S.settings=Object.assign({},S.settings,{noteAskSnooze:Date.now()+14*DAY});persist();render();return}
+  if(act==="delpastnote"){if(!confirm("Remove this note?"))return;S.pastNotes=S.pastNotes.filter(n=>n.id!==id);persist();render();return}
   if(act==="yesterday"){prog={unit:"day",offset:-1};goTab("progress");return}
   if(act==="unlog"){const [tid,at]=id.split("@");const t=T(tid);if(!t)return;if(!confirm("Remove this from that day? Its star will leave your sky."))return;t.log=t.log.filter(l=>String(l.at)!==at);persist();render();toast("Removed.");return}
   if(act==="reveal"){b.classList.toggle("reveal");return}
@@ -1802,11 +2048,13 @@ document.addEventListener("submit",async e=>{
     const n=F.pin2.value.trim();if(!/^\d{4,12}$/.test(n)){toast("Use 4 to 12 digits for the new passcode.");return}
     const salt=rid();S.settings.photoLock={salt,hash:await hashPin(n,salt)};persist();render();toast("Passcode changed.");return}
   if(kind==="removepin"){const L=photoLock();if(L&&(await hashPin(F.pin.value,L.salt))===L.hash){delete S.settings.photoLock;const had=anyLocked();locksToBlur();persist();render();toast(had?"Passcode off. Locked photos are blurred instead.":"Passcode turned off.")}else{F.pin.value="";toast("That passcode didn't match.")}return}
+  if(kind==="pastnote"){const text=F.text.value.trim();if(!text)return;S.pastNotes.push({id:rid(),text,at:Date.now()});persist();render();toast("Saved. Remind Me will show it to you when you need it.");return}
   if(kind==="addq"){const text=F.text.value.trim();if(!text)return;S.myQuotes.push({id:rid(),text,who:F.who.value.trim()});persist();render();toast("Added. It'll show up in your sky on its day.");return}
 });
 
 function saveNote(inp){const t=T(inp.dataset.note);const l=t&&t.log[t.log.length-1];if(l){l.note=inp.value.trim();persist()}}
 document.addEventListener("keydown",e=>{
+  if(story){if(e.key==="Escape"){closeStory();return}if(!story.opt.noNav&&!e.target.closest("input,textarea")){if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();showSlide(story.i+1)}if(e.key==="ArrowLeft"){e.preventDefault();showSlide(story.i-1)}}return}
   if(e.key==="Escape"&&$("#drawer").classList.contains("open")){closeMenu();$(".menu-btn").focus();return}
   if(e.key==="Escape"&&$("#modal").innerHTML){closeModal();render();return}
   const n=e.target.closest?.("[data-note]");

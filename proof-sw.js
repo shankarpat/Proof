@@ -1,5 +1,5 @@
 // Keeps Proof working offline. Change the version when you update app.html.
-const CACHE="proof-v1";
+const CACHE="proof-v2";
 const FILES=["./app.html","./proof.webmanifest","./proof-icon-192.png","./proof-icon-512.png","./proof-apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
