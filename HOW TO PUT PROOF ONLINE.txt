@@ -1,0 +1,81 @@
+HOW TO PUT PROOF ONLINE (free, about 15 minutes)
+
+You'll use GitHub for two things:
+  - GitHub Pages hosts the website (this folder).
+  - GitHub Releases hosts the Windows download (Proof-Windows.zip).
+The zip is too big for the website itself, so it goes in a Release.
+
+------------------------------------------------------------
+1. MAKE A GITHUB ACCOUNT
+------------------------------------------------------------
+Go to github.com and sign up. Your username becomes part of your
+website address, for example:  https://yourname.github.io/proof/
+
+------------------------------------------------------------
+2. CREATE THE WEBSITE
+------------------------------------------------------------
+a. On GitHub, click the + (top right) > New repository.
+b. Name it:  proof
+   Set it to Public. Click Create repository.
+c. Click "uploading an existing file".
+d. Open this folder on your computer, select EVERYTHING inside it
+   (index.html, privacy.html, the app folder, the assets folder)
+   and drag it onto the page. Wait for it to finish, then click
+   Commit changes.
+e. Go to Settings > Pages. Under "Build and deployment", set
+   Source to "Deploy from a branch", Branch to "main" and "/ (root)".
+   Click Save.
+f. After a minute or two, your site is live at:
+   https://YOUR-GITHUB-NAME.github.io/proof/
+
+------------------------------------------------------------
+3. ADD THE WINDOWS DOWNLOAD
+------------------------------------------------------------
+a. In your proof repository, click Releases (right side) >
+   Create a new release.
+b. Click "Choose a tag", type  v1.0  and click Create new tag.
+c. Title: Proof 1.0
+d. Drag Proof-Windows.zip into the box that says
+   "Attach binaries". Keep the file name exactly Proof-Windows.zip.
+e. Click Publish release.
+
+------------------------------------------------------------
+4. POINT THE BUTTON AT YOUR DOWNLOAD (and add your tip link)
+------------------------------------------------------------
+a. In the repository, click index.html, then the pencil (Edit).
+b. Near the bottom, find these lines:
+
+   windowsDownload: "https://github.com/YOUR-GITHUB-NAME/proof/releases/latest/download/Proof-Windows.zip",
+   tipLink: ""
+
+c. Replace YOUR-GITHUB-NAME with your GitHub username.
+   Put your Ko-fi / Buy Me a Coffee / PayPal.me link between the
+   quotes on tipLink, or leave it empty to hide the tip line.
+d. Click Commit changes.
+e. Also edit privacy.html and replace "your contact email here"
+   with an email people can reach you at.
+
+That's it. Share https://YOUR-GITHUB-NAME.github.io/proof/ with
+your friends.
+
+------------------------------------------------------------
+UPDATING LATER
+------------------------------------------------------------
+- New version of the app in the browser/phone version:
+  upload the new file as  app/index.html  (replace it), and in
+  app/sw.js change  proof-v1  to  proof-v2  (then v3, and so on)
+  so phones pick up the update.
+- New Windows version: create a new release (v1.1, v1.2...) and
+  attach the new Proof-Windows.zip with the same file name.
+  The download button always gets the newest one automatically.
+
+------------------------------------------------------------
+GOOD TO KNOW
+------------------------------------------------------------
+- Everyone's data stays on their own device. You never see it.
+- Windows will show "Windows protected your PC" for downloads
+  that aren't from the Microsoft Store. The website tells people
+  to click More info > Run anyway.
+- A few built-in quotes are from books still under copyright
+  (for example Tolkien and Harry Potter). For a public site, it's
+  safer to swap those for public-domain ones. Ask Claude to do it.
