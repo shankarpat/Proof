@@ -279,7 +279,7 @@ const PROOF = {
 (function(){
   const $=s=>document.querySelector(s);
   $("#yr").textContent=new Date().getFullYear();
-  const placeholder=PROOF.windowsDownload.includes("shankarpat");
+  const placeholder=PROOF.windowsDownload.includes("YOUR-GITHUB-NAME");
   for(const a of [$("#dlMain"),$("#dlWin")]){
     a.href=PROOF.windowsDownload;
     a.addEventListener("click",e=>{if(placeholder){e.preventDefault();toast("The download link isn't set yet. Add it at the top of the script in index.html.")}});
