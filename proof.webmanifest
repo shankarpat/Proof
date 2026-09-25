@@ -1,0 +1,28 @@
+{
+  "name": "Proof",
+  "short_name": "Proof",
+  "description": "Proof that you keep showing up for yourself.",
+  "start_url": "app.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#141030",
+  "theme_color": "#141030",
+  "icons": [
+    {
+      "src": "proof-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "proof-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "proof-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
