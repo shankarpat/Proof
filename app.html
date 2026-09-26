@@ -1006,7 +1006,12 @@ async function firstSync(inside){
   const row=await fetchSky();
   if(!row){sync={rev:0,dirty:true,at:0};setBase(null)}
   else if(!hasContent(S)||same(snapshot(),row.state)){applyRemote(row.state);sync={rev:row.rev,dirty:false,at:0};setBase(row.state)}
-  else return {choose:row};
+  else{ // both have stars: always combine, so nothing is ever lost
+    const m=dedupeNamed(merge3(undefined,snapshot(),row.state));m.onboarded=!!(S.onboarded||row.state.onboarded);m.seeded=true;
+    applyRemote(m);sync={rev:row.rev,dirty:true,at:0};setBase(row.state);saveSync();
+    if(inside)syncAgain=true;else await syncNow();
+    return "combined";
+  }
   saveSync();if(inside)syncAgain=true;else await syncNow(); // inside a sync already: go again right after it
   return row?"restored":"new";
 }
@@ -1034,7 +1039,7 @@ function syncNow(){
   if(syncing){syncAgain=true;return syncing}
   syncing=(async()=>{
     try{
-      if(sync.needsFirst){const res=await firstSync(true);if(res&&res.choose){syncStatus="";syncLabel();openFirstChoice(res.choose)}return}
+      if(sync.needsFirst){const res=await firstSync(true);if(res==="combined")toast("Logged in. This device's sky and your account's are combined, so nothing was lost.");return}
       syncStatus="syncing";syncLabel();
       for(let i=0;i<5;i++){
         const row=await fetchSky(),srev=row?row.rev:0;
@@ -1174,8 +1179,7 @@ document.addEventListener("submit",async e=>{
   acctFlow=null;sync={rev:0,dirty:false,at:0,needsFirst:true};saveSync();setBase(null);syncStatus="syncing";$("#toast").classList.remove("show");render();
   try{
     const res=await firstSync();
-    if(res&&res.choose){syncStatus="";render();openFirstChoice(res.choose);return}
-    render();toast(res==="restored"?"Welcome back. Your sky is here.":"Your account is ready. Your sky now syncs to it.");
+    render();toast(res==="combined"?"Logged in. This device's sky and your account's are combined, so nothing was lost.":res==="restored"?"Welcome back. Your sky is here.":"Your account is ready. Your sky now syncs to it.");
   }catch(err){syncStatus="offline";render();toast("Signed in. Proof will sync as soon as it can reach the internet.")}
 },true);
 setInterval(()=>{
