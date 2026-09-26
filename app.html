@@ -895,12 +895,12 @@ async function photoBlob(ph){if(ph.asset){const r=await fetch(photoSrc(ph));retu
 
 
 /* ---------- account & sync (Supabase) ---------- */
-const SB={url:"https://hdvbxzggyfqjhpaiafwz.supabase.co",key:"sb_publishable_uooNqCp9o-lIBYPzc7P1bQ_td4oNXbj"};
+const SB={url:"https://zfhfciwdivnvikleocrw.supabase.co",key:"sb_publishable_zj50AO4QswoWndrvr2tBhg_ZFBlp7iU"};
 const ACCOUNTS=!(window.claude&&window.claude.use);
 const SITE="https://shankarpat.github.io/Proof/"; // where account.html lives // the Claude artifact version keeps its own sync
 let acct=null,sync={rev:0,dirty:false,at:0},syncBase=null,syncing=null,syncAgain=false,syncTimer=null,syncStatus="",acctFlow=null,renderLater=false,refreshing=null;
 class SBErr extends Error{constructor(m,s){super(m);this.status=s||0}}
-function loadAcct(){try{acct=JSON.parse(localStorage.getItem("proof-account")||"null");sync=Object.assign({rev:0,dirty:false,at:0},JSON.parse(localStorage.getItem("proof-sync")||"{}"));syncBase=JSON.parse(localStorage.getItem("proof-sync-base")||"null")}catch(e){acct=null}if(!ACCOUNTS)acct=null}
+function loadAcct(){try{acct=JSON.parse(localStorage.getItem("proof-account")||"null");sync=Object.assign({rev:0,dirty:false,at:0},JSON.parse(localStorage.getItem("proof-sync")||"{}"));syncBase=JSON.parse(localStorage.getItem("proof-sync-base")||"null")}catch(e){acct=null}if(!ACCOUNTS)acct=null;if(acct&&acct.project!==SB.url){acct=null;saveAcct();clearSync()}} // a login from an earlier Supabase project
 function saveAcct(){try{acct?localStorage.setItem("proof-account",JSON.stringify(acct)):localStorage.removeItem("proof-account")}catch(e){}}
 function saveSync(){try{localStorage.setItem("proof-sync",JSON.stringify(sync))}catch(e){}}
 function setBase(st){syncBase=st??null;try{st?localStorage.setItem("proof-sync-base",JSON.stringify(st)):localStorage.removeItem("proof-sync-base")}catch(e){}}
@@ -956,7 +956,7 @@ function dedupeNamed(st){
 }
 
 /* talking to Supabase */
-function setSession(j){acct={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:{id:j.user.id,email:j.user.email,name:(j.user.user_metadata&&j.user.user_metadata.name)||""}};saveAcct()}
+function setSession(j){acct={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:{id:j.user.id,email:j.user.email,name:(j.user.user_metadata&&j.user.user_metadata.name)||""},project:SB.url};saveAcct()}
 function refreshSession(){
   if(refreshing)return refreshing;
   return refreshing=(async()=>{

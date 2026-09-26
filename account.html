@@ -148,6 +148,17 @@ input[aria-invalid="true"]{border-color:var(--bad)}
       <p class="alt"><button class="link" data-go="forgot">Send a new code</button></p>
     </section>
 
+    <!-- New password, after following a reset link -->
+    <section data-view="setpw" hidden>
+      <h1>Choose a new password</h1>
+      <p class="sub">Almost there. Pick a new password for <b data-email></b>.</p>
+      <div class="msg"></div>
+      <form data-form="setpw" novalidate>
+        <label><span>New password</span><div class="pw"><input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"><button type="button" data-act="showpw">Show</button></div></label>
+        <button class="btn primary" type="submit">Save new password</button>
+      </form>
+    </section>
+
     <!-- Done / signed in -->
     <section data-view="done" hidden>
       <svg class="star" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="22" fill="#F6D98B" opacity=".2"/><circle cx="27" cy="27" r="13" fill="#F6D98B" opacity=".25"/><path d="M27 9l4 12.5L43.5 25 31 29l-4 12.5L23 29l-12.5-4L23 21.5z" fill="#FFF3C9"/></svg>
@@ -169,11 +180,11 @@ input[aria-invalid="true"]{border-color:var(--bad)}
   </div>
 </main>
 <script>
-const SB={url:"https://hdvbxzggyfqjhpaiafwz.supabase.co",key:"sb_publishable_uooNqCp9o-lIBYPzc7P1bQ_td4oNXbj"};
+const SB={url:"https://zfhfciwdivnvikleocrw.supabase.co",key:"sb_publishable_zj50AO4QswoWndrvr2tBhg_ZFBlp7iU"};
 const q=new URLSearchParams(location.search);
 const fromApp=q.get("from")==="app";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-let email="",fresh=false;
+let email="",fresh=false,recovery=null;
 
 /* ---- the quiet starfield behind the card ---- */
 (function(){const c=$("#sky"),x=c.getContext("2d");let st=[];
@@ -209,13 +220,15 @@ async function api(path,body,{method="POST",token}={}){
 }
 function saveSession(j){
   const acct={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),
-    user:{id:j.user.id,email:j.user.email,name:(j.user.user_metadata&&j.user.user_metadata.name)||""}};
+    user:{id:j.user.id,email:j.user.email,name:(j.user.user_metadata&&j.user.user_metadata.name)||""},project:SB.url};
   let prev=null;try{prev=JSON.parse(localStorage.getItem("proof-account")||"null")}catch(e){}
   // Proof (in this browser) will ask how to combine skies the first time it sees this account.
   if(!prev||prev.user.id!==acct.user.id){localStorage.setItem("proof-sync",JSON.stringify({rev:0,dirty:false,at:0,needsFirst:true}));localStorage.removeItem("proof-sync-base")}
   localStorage.setItem("proof-account",JSON.stringify(acct));
   return acct;
 }
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const detail=e=>`<br><small style="opacity:.75">Details: ${escH(e.message)}${e.status?` (${e.status})`:""}</small>`;
 function friendly(e,ctx){
   if(e.message==="offline")return "Proof can't reach the internet right now. Check your connection and try again.";
   const m=(e.message||"").toLowerCase();
@@ -225,7 +238,9 @@ function friendly(e,ctx){
   if(m.includes("password")&&(m.includes("least")||m.includes("weak")||e.code==="weak_password"))return "Choose a longer password, at least 8 characters. A few words together works well.";
   if(m.includes("already registered")||e.code==="user_already_exists")return "There's already an account with this email. <button class=\"link\" data-go=\"login\">Log in instead</button>.";
   if(m.includes("signups not allowed"))return "New accounts aren't open right now. Please try again later.";
-  return "Something went wrong. Try again in a moment.";
+  if(m.includes("sending")&&m.includes("email")||e.code==="unexpected_failure"&&m.includes("mail"))return "Proof couldn't send the email just now. Please try again in a few minutes."+detail(e);
+  if(m.includes("email")&&m.includes("invalid")||e.code==="email_address_invalid")return "That email address can't receive mail. Check it and try again."+detail(e);
+  return "Something went wrong. Try again in a moment."+detail(e);
 }
 
 /* ---- forms ---- */
@@ -273,6 +288,14 @@ document.addEventListener("submit",async e=>{
     catch(err){busy(f,false);say(friendly(err,"forgot"))}
     return;
   }
+  if(k==="setpw"){
+    const pw=F.password.value;
+    if(pw.length<8){F.password.setAttribute("aria-invalid","true");F.password.focus();return say("Choose a password with at least 8 characters.")}
+    busy(f,true,"Saving\u2026");
+    try{await api("/auth/v1/user",{password:pw},{method:"PUT",token:recovery.access_token});saveSession(recovery);recovery=null;fresh=false;done("Your new password is saved.")}
+    catch(err){busy(f,false);say(friendly(err,"setpw"))}
+    return;
+  }
   if(k==="reset"){
     const code=F.code.value.replace(/\D/g,""),pw=F.password.value;
     if(code.length<6){F.code.focus();return say("Enter the code from your email.")}
@@ -310,7 +333,26 @@ function done(note){
 }
 
 /* ---- start ---- */
-(function(){
+(async function(){
+  // Forget a login from an earlier Supabase project
+  try{const old=JSON.parse(localStorage.getItem("proof-account")||"null");if(old&&old.project!==SB.url)["proof-account","proof-sync","proof-sync-base"].forEach(k=>localStorage.removeItem(k))}catch(e){}
+  // Arriving from a link in an email (confirm your email, or reset your password)
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get("access_token")||h.get("error")||h.get("error_code")){
+    history.replaceState(null,"",location.pathname+location.search);
+    if(h.get("error")||h.get("error_code")){
+      const expired=/expired|invalid/i.test((h.get("error_code")||"")+" "+(h.get("error_description")||""));
+      show("login");say(expired?"That link has expired or was already used. Log in below, or choose \u201cForgot password?\u201d to get a new one.":"That link didn't work. Try logging in below.");return;
+    }
+    try{
+      const tok=h.get("access_token");
+      const user=await api("/auth/v1/user",undefined,{method:"GET",token:tok});
+      const j={access_token:tok,refresh_token:h.get("refresh_token"),expires_at:+h.get("expires_at")||undefined,expires_in:+h.get("expires_in")||3600,user};
+      email=user.email||"";
+      if(h.get("type")==="recovery"){recovery=j;show("setpw");return}
+      saveSession(j);fresh=h.get("type")==="signup";return done(fresh?"Your email is confirmed.":"");
+    }catch(err){show("login");say(friendly(err,"link"));return}
+  }
   let a=null;try{a=JSON.parse(localStorage.getItem("proof-account")||"null")}catch(e){}
   const mode=q.get("mode");
   if(a&&!mode){email=a.user.email;return done()}
