@@ -539,6 +539,7 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 .acct-choice{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;padding:14px 16px;cursor:pointer;font:inherit}
 .acct-choice:hover,.acct-choice:focus-visible{border-color:var(--accent)}
 .acct-choice span{font-size:14px;color:var(--muted)}
+.acct-link{color:var(--accent);font-weight:600}
 .acct-del{background:none;border:0;padding:0;color:var(--muted);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer}
 .btn.acct-danger{background:#B4495A;color:#fff}
 </style>
@@ -895,7 +896,8 @@ async function photoBlob(ph){if(ph.asset){const r=await fetch(photoSrc(ph));retu
 
 /* ---------- account & sync (Supabase) ---------- */
 const SB={url:"https://hdvbxzggyfqjhpaiafwz.supabase.co",key:"sb_publishable_uooNqCp9o-lIBYPzc7P1bQ_td4oNXbj"};
-const ACCOUNTS=!(window.claude&&window.claude.use); // the Claude artifact version keeps its own sync
+const ACCOUNTS=!(window.claude&&window.claude.use);
+const SITE="https://shankarpat.github.io/Proof/"; // where account.html lives // the Claude artifact version keeps its own sync
 let acct=null,sync={rev:0,dirty:false,at:0},syncBase=null,syncing=null,syncAgain=false,syncTimer=null,syncStatus="",acctFlow=null,renderLater=false,refreshing=null;
 class SBErr extends Error{constructor(m,s){super(m);this.status=s||0}}
 function loadAcct(){try{acct=JSON.parse(localStorage.getItem("proof-account")||"null");sync=Object.assign({rev:0,dirty:false,at:0},JSON.parse(localStorage.getItem("proof-sync")||"{}"));syncBase=JSON.parse(localStorage.getItem("proof-sync-base")||"null")}catch(e){acct=null}if(!ACCOUNTS)acct=null}
@@ -954,7 +956,7 @@ function dedupeNamed(st){
 }
 
 /* talking to Supabase */
-function setSession(j){acct={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:{id:j.user.id,email:j.user.email}};saveAcct()}
+function setSession(j){acct={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:{id:j.user.id,email:j.user.email,name:(j.user.user_metadata&&j.user.user_metadata.name)||""}};saveAcct()}
 function refreshSession(){
   if(refreshing)return refreshing;
   return refreshing=(async()=>{
@@ -983,7 +985,7 @@ async function sbReq(path,{method="GET",body,headers={},auth=true,raw=false}={},
 const sendCode=email=>sbReq("/auth/v1/otp",{method:"POST",body:{email,create_user:true},auth:false});
 async function verifyCode(email,token){setSession(await sbReq("/auth/v1/verify",{method:"POST",body:{type:"email",email,token},auth:false}))}
 const fetchSky=async()=>((await sbReq(`/rest/v1/skies?select=state,rev&user_id=eq.${acct.user.id}`))||[])[0]||null;
-function signedOutRemotely(){acct=null;saveAcct();clearSync();syncStatus="";syncLabel();if(tab==="settings")softRender();toast("You've been signed out. Your sky is still here on this device. Sign in again to keep syncing.")}
+function signedOutRemotely(){acct=null;saveAcct();clearSync();syncStatus="";syncLabel();if(tab==="settings")softRender();toast("You've been logged out. Your sky is still here on this device. Log in again to keep syncing.")}
 
 /* keeping this device and the account in step */
 function applyRemote(st){
@@ -998,13 +1000,15 @@ function applyRemote(st){
 const uiBusy=()=>!!(document.activeElement?.matches?.("input,textarea,select")||$("#modal").innerHTML||(typeof story!=="undefined"&&story)||tour||welcome);
 function softRender(){if(uiBusy()){renderLater=true;return}renderLater=false;render()}
 function markDirty(){if(!acct||tour)return;sync.dirty=true;saveSync();syncLabel();clearTimeout(syncTimer);syncTimer=setTimeout(syncNow,2500)}
-async function firstSync(){
+async function firstSync(inside){
   sync.needsFirst=true;saveSync();
+  if(!S.name&&acct.user.name){S.name=acct.user.name;try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}}
   const row=await fetchSky();
   if(!row){sync={rev:0,dirty:true,at:0};setBase(null)}
   else if(!hasContent(S)||same(snapshot(),row.state)){applyRemote(row.state);sync={rev:row.rev,dirty:false,at:0};setBase(row.state)}
   else return {choose:row};
-  saveSync();await syncNow();return row?"restored":"new";
+  saveSync();if(inside)syncAgain=true;else await syncNow(); // inside a sync already: go again right after it
+  return row?"restored":"new";
 }
 function resolveFirst(choice,row){
   if(choice==="account"){applyRemote(row.state);sync={rev:row.rev,dirty:false,at:0}}
@@ -1030,7 +1034,7 @@ function syncNow(){
   if(syncing){syncAgain=true;return syncing}
   syncing=(async()=>{
     try{
-      if(sync.needsFirst){const res=await firstSync();if(res&&res.choose){syncStatus="";syncLabel();openFirstChoice(res.choose)}return}
+      if(sync.needsFirst){const res=await firstSync(true);if(res&&res.choose){syncStatus="";syncLabel();openFirstChoice(res.choose)}return}
       syncStatus="syncing";syncLabel();
       for(let i=0;i<5;i++){
         const row=await fetchSky(),srev=row?row.rev:0;
@@ -1090,18 +1094,26 @@ function syncLabel(){
 function accountCard(){
   if(!ACCOUNTS)return "";
   if(acct)return `<div class="card" id="account"><strong>Your account</strong>
-    <p class="t-sub" style="margin:4px 0 10px">Signed in as <b>${esc(acct.user.email)}</b>. Your sky syncs to every device where you sign in.</p>
+    <p class="t-sub" style="margin:4px 0 10px">Logged in as <b>${esc(acct.user.email)}</b>. Your sky syncs to every device where you log in.</p>
     <p class="t-sub" style="margin:0 0 12px" id="acctStatus">${esc(syncText())}</p>
-    <div class="row">${sync.needsFirst?`<button class="btn" data-act="syncnow">Choose how to combine</button>`:`<button class="btn quiet" data-act="syncnow">Sync now</button>`}<button class="btn ghost" data-act="signout">Sign out</button></div>
+    <div class="row">${sync.needsFirst?`<button class="btn" data-act="syncnow">Choose how to combine</button>`:`<button class="btn quiet" data-act="syncnow">Sync now</button>`}<button class="btn ghost" data-act="signout">Log out</button></div>
     <p style="margin:14px 0 0"><button class="acct-del" data-act="delacct">Delete my account</button></p></div>`;
-  if(acctFlow&&acctFlow.sent)return `<div class="card" id="account"><strong>Check your email</strong>
-    <p class="t-sub" style="margin:4px 0 12px">We sent a sign-in code to <b>${esc(acctFlow.email)}</b>. It can take a minute, and it's worth checking your spam folder.</p>
-    <form data-form="acctcode"><label class="field" style="margin:0 0 12px"><span>Your code</span><input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="123456" required style="max-width:220px;letter-spacing:.2em"></label>
-    <div class="row"><button class="btn" type="submit">Sign in</button><button class="btn ghost" type="button" data-act="acctresend">Send a new code</button><button class="btn ghost" type="button" data-act="acctback">Use a different email</button></div></form></div>`;
-  return `<div class="card" id="account"><strong>Create an account or sign in</strong>
-    <p class="t-sub" style="margin:4px 0 12px">An account keeps your sky on your phone, your computer and the web. Just enter your email. If you're new, Proof creates your account; if you already have one, it signs you in. There's no password: we'll email you a code. Proof works exactly the same without an account.</p>
-    <form data-form="acctemail"><label class="field" style="margin:0 0 12px"><span>Your email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com" value="${esc(acctFlow?.email||"")}"></label>
-    <button class="btn" type="submit">Email me a code</button></form></div>`;
+  const pg=desk?SITE+"account.html":"account.html",tgt=desk?' target="_blank" rel="noopener"':"",fa=desk?"&from=app":"";
+  return `<div class="card" id="account"><strong>Log in to sync your sky</strong>
+    <p class="t-sub" style="margin:4px 0 12px">With a free account, your sky follows you to your phone, your computer and the web. Proof works exactly the same without one.</p>
+    <form data-form="acctlogin"><label class="field" style="margin:0 0 10px"><span>Email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com" value="${esc(acctFlow?.email||"")}"></label>
+    <label class="field" style="margin:0 0 6px"><span>Password</span><input name="password" type="password" autocomplete="current-password" required placeholder="Your password"></label>
+    <p style="margin:0 0 14px;text-align:right"><a class="acct-link" href="${pg}?mode=forgot${fa}"${tgt}>Forgot password?</a></p>
+    <button class="btn" type="submit">Log in</button></form>
+    <p class="t-sub" style="margin:18px 0 0">New to Proof accounts? <a class="acct-link" href="${pg}${desk?"?from=app":""}"${tgt}>Create an account</a>${desk?" <span>(opens in your browser)</span>":""}</p></div>`;
+}
+function loginErr(e){
+  const m=(e.message||"").toLowerCase();
+  if(e.message==="offline")return "Proof can't reach the internet right now. Try again when you're connected.";
+  if(e.status===429)return "That's a lot of tries in a row. Wait a minute, then try again.";
+  if(m.includes("not confirmed"))return "Confirm your email first: enter the code Proof emailed you on the account page, then log in here.";
+  if(m.includes("invalid login")||e.status===400)return "That email and password don't match. Try again, or choose \u201cForgot password?\u201d";
+  return "Something went wrong logging in. Try again in a moment.";
 }
 function authErr(e,verify){
   if(e.message==="offline")return "Proof can't reach the internet right now. Try again when you're connected.";
@@ -1118,8 +1130,8 @@ async function signOut(clear){
   if(clear){
     for(const ph of S.photos){try{await IDB.del(ph.id)}catch(e){}if(photoURLs[ph.id]){URL.revokeObjectURL(photoURLs[ph.id]);delete photoURLs[ph.id]}}
     S=EMPTY();migrate();try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}
-    render();syncLabel();toast("Signed out, and this device is cleared. Your sky is safe in your account.");
-  }else{render();syncLabel();toast("Signed out. Your sky is still on this device, and safe in your account.")}
+    render();syncLabel();toast("Logged out, and this device is cleared. Your sky is safe in your account.");
+  }else{render();syncLabel();toast("Logged out. Your sky is still on this device, and safe in your account.")}
 }
 async function deleteAccount(){
   closeModal();toast("Deleting your account…");
@@ -1140,9 +1152,9 @@ document.addEventListener("click",e=>{
   if(act==="acctback"){acctFlow={email:acctFlow?.email||""};render();document.querySelector('[data-form="acctemail"] input')?.focus();return}
   if(act==="acctresend"){const em=acctFlow?.email;if(!em)return;sendCode(em).then(()=>toast("A new code is on its way.")).catch(err=>toast(authErr(err)));return}
   if(act==="firstchoice"){const row=window.__firstRow;if(row)resolveFirst(b.dataset.id,row);return}
-  if(act==="signout"){openModal(`<div style="padding:6px"><h2 style="margin-top:4px">Sign out of Proof?</h2><p class="t-sub" style="margin:0 0 16px">Your sky stays safe in your account. Sign in again anytime to pick up where you left off.</p>
-    <div class="acct-choices"><button class="acct-choice" data-act="signoutkeep"><strong>Sign out</strong><span>Keep my sky on this device too.</span></button>
-    <button class="acct-choice" data-act="signoutclear"><strong>Sign out and clear this device</strong><span>Good for a shared or borrowed computer.</span></button></div>
+  if(act==="signout"){openModal(`<div style="padding:6px"><h2 style="margin-top:4px">Log out of Proof?</h2><p class="t-sub" style="margin:0 0 16px">Your sky stays safe in your account. Log in again anytime to pick up where you left off.</p>
+    <div class="acct-choices"><button class="acct-choice" data-act="signoutkeep"><strong>Log out</strong><span>Keep my sky on this device too.</span></button>
+    <button class="acct-choice" data-act="signoutclear"><strong>Log out and clear this device</strong><span>Good for a shared or borrowed computer.</span></button></div>
     <div class="row" style="margin-top:14px"><button class="btn ghost" data-act="closemodal">Cancel</button></div></div>`);return}
   if(act==="signoutkeep"){signOut(false);return}
   if(act==="signoutclear"){signOut(true);return}
@@ -1151,19 +1163,15 @@ document.addEventListener("click",e=>{
   if(act==="delacctyes"){deleteAccount();return}
 });
 document.addEventListener("submit",async e=>{
-  const f=e.target,k=f.dataset&&f.dataset.form;if(k!=="acctemail"&&k!=="acctcode")return;
+  const f=e.target,k=f.dataset&&f.dataset.form;if(k!=="acctlogin")return;
   e.preventDefault();e.stopImmediatePropagation();const F=f.elements;
-  if(k==="acctemail"){
-    const email=F.email.value.trim().toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast("That email doesn't look quite right. Check it and try again.");return}
-    busyBtn(f,true);
-    try{await sendCode(email);acctFlow={email,sent:true};render();document.querySelector('[data-form="acctcode"] input')?.focus();toast("Code sent. Check your email.")}
-    catch(err){busyBtn(f,false);toast(authErr(err))}
-    return;
-  }
-  const code=F.code.value.replace(/\D/g,"");if(code.length<6){toast("Enter the code from your email.");return}
-  busyBtn(f,true);
-  try{await verifyCode(acctFlow.email,code)}catch(err){busyBtn(f,false);toast(authErr(err,true));return}
-  acctFlow=null;syncStatus="syncing";$("#toast").classList.remove("show");render();
+  const email=F.email.value.trim().toLowerCase(),pw=F.password.value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast("That email doesn't look quite right. Check it and try again.");F.email.focus();return}
+  if(!pw){toast("Enter your password.");F.password.focus();return}
+  acctFlow={email};busyBtn(f,true);
+  try{setSession(await sbReq("/auth/v1/token?grant_type=password",{method:"POST",body:{email,password:pw},auth:false}))}
+  catch(err){busyBtn(f,false);toast(loginErr(err));return}
+  acctFlow=null;sync={rev:0,dirty:false,at:0,needsFirst:true};saveSync();setBase(null);syncStatus="syncing";$("#toast").classList.remove("show");render();
   try{
     const res=await firstSync();
     if(res&&res.choose){syncStatus="";render();openFirstChoice(res.choose);return}
@@ -1177,7 +1185,7 @@ setInterval(()=>{
 document.addEventListener("focusout",()=>setTimeout(()=>{if(renderLater&&!uiBusy()){renderLater=false;render()}},300));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&acct)syncNow()});
 addEventListener("online",()=>{if(acct)syncNow()});
-addEventListener("storage",e=>{if(e.key==="proof-account"){try{acct=JSON.parse(e.newValue||"null")}catch(err){}syncLabel()}});
+addEventListener("storage",e=>{if(e.key==="proof-account"){const had=acct&&acct.user.id;loadAcct();syncLabel();if(tab==="settings")softRender();if(acct&&acct.user.id!==had)syncNow()}}); // logged in or out on the account page
 
 /* ---------- skies ---------- */
 const SKIES={
@@ -2198,7 +2206,7 @@ function welStep(n){
   const P=S.priorities.find(p=>p.id===w.pid),T0=S.tasks.find(t=>t.id===w.tid);
   const views=[
     `${dots}<h1>Welcome to Proof.</h1><p>A kind place to keep small promises to yourself. Every one you keep becomes a star, and over time your sky fills with evidence of who you are.</p>
-      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button>${ACCOUNTS?`<button class="btn ghost" data-wel="signin">Sign in or create an account</button>`:""}</div>`,
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button>${ACCOUNTS&&!acct?`<button class="btn ghost" data-wel="signin">Log in or create an account</button>`:""}</div>`,
     `${dots}<h2>What should Proof call you?</h2><p>Just a first name or a nickname. You can skip this.</p>
       <form data-welform="name"><label class="field"><span>Your name</span><input name="name" maxlength="40" value="${esc(w.name)}" autocomplete="given-name"></label>
       <div class="row"><button class="btn" type="submit">Next</button><button class="skip" type="button" data-wel="skipname">Skip</button></div></form>`,
