@@ -535,6 +535,21 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 .quotes-list li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:flex-start}
 .quotes-list li:first-child{border-top:0}
 .quotes-list q{flex:1}
+.me-btn{position:absolute;top:14px;right:14px;z-index:5;height:44px;min-width:44px;border-radius:999px;border:0;background:rgba(20,14,40,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:0;font:inherit;font-weight:600;font-size:15px;overflow:hidden}
+.me-btn:hover{background:rgba(20,14,40,.55)}
+.me-btn.out{padding:0 16px 0 12px}
+.me-btn svg{width:22px;height:22px}
+.me-btn.in{width:44px;padding:0;box-shadow:0 0 0 2px rgba(246,217,139,.85),0 4px 18px rgba(0,0,0,.35)}
+.avatar{display:grid;place-items:center;border-radius:50%;overflow:hidden;background:linear-gradient(145deg,#8C77B5,#F1A59F);color:#fff;font-family:var(--serif);flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.me-btn .avatar{width:100%;height:100%;font-size:19px}
+.prof-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin:4px 0 22px}
+.prof-pic{position:relative;border:0;padding:0;background:none;cursor:pointer;border-radius:50%;margin-bottom:8px}
+.prof-pic .avatar{width:112px;height:112px;font-size:46px;box-shadow:0 0 0 4px var(--surface),0 0 0 6px rgba(246,217,139,.7)}
+.prof-pic .cam{position:absolute;right:2px;bottom:2px;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 0 0 3px var(--surface)}
+.prof-pic .cam svg{width:18px;height:18px}
+.prof-head h2{margin:0}
+.prof-head .t-sub{margin:0}
 .acct-choices{display:flex;flex-direction:column;gap:10px}
 .acct-choice{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;padding:14px 16px;cursor:pointer;font:inherit}
 .acct-choice:hover,.acct-choice:focus-visible{border-color:var(--accent)}
@@ -548,6 +563,7 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 <header class="sky-wrap">
   <svg id="sky" aria-label="Your sky: one star for every promise you kept"></svg>
   <button class="menu-btn" data-act="menu" aria-label="Open menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <button class="me-btn out" id="meBtn" data-act="profile" aria-label="Your profile"></button>
   <div class="sky-text"><p id="greet"></p><h1 id="headline"></h1><p class="attr" id="attr"></p></div>
 </header>
 
@@ -1092,6 +1108,7 @@ function syncText(){
   return sync.at?"Last synced "+ago(sync.at)+".":"Not synced yet.";
 }
 function syncLabel(){
+  updateMe();
   const el=$("#syncState");
   if(el)el.textContent=!acct?(desk?"Saved on this computer":dbRef?"Saved to your account, on every device":"Saved on this device"):syncStatus==="syncing"?"Syncing…":syncStatus==="offline"?"Offline. Saved here, will sync later":sync.dirty?"Saved here, syncing soon":"Synced to your account";
   const st=$("#acctStatus");if(st)st.textContent=syncText();
@@ -1110,7 +1127,7 @@ function accountCard(){
     <label class="field" style="margin:0 0 6px"><span>Password</span><input name="password" type="password" autocomplete="current-password" required placeholder="Your password"></label>
     <p style="margin:0 0 14px;text-align:right"><a class="acct-link" href="${pg}?mode=forgot${fa}"${tgt}>Forgot password?</a></p>
     <button class="btn" type="submit">Log in</button></form>
-    <p class="t-sub" style="margin:18px 0 0">New to Proof accounts? <a class="acct-link" href="${pg}${desk?"?from=app":""}"${tgt}>Create an account</a>${desk?" <span>(opens in your browser)</span>":""}</p></div>`;
+    <p class="t-sub" style="margin:18px 0 0">New to Proof? <a class="acct-link" href="${pg}${desk?"?from=app":""}"${tgt}>Create an account</a>${desk?" <span>(opens in your browser)</span>":""}</p></div>`;
 }
 function loginErr(e){
   const m=(e.message||"").toLowerCase();
@@ -1190,6 +1207,49 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(renderLater&&!uiBusy
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&acct)syncNow()});
 addEventListener("online",()=>{if(acct)syncNow()});
 addEventListener("storage",e=>{if(e.key==="proof-account"){const had=acct&&acct.user.id;loadAcct();syncLabel();if(tab==="settings")softRender();if(acct&&acct.user.id!==had)syncNow()}}); // logged in or out on the account page
+
+
+/* ---------- profile (top-right button) ---------- */
+function initialOf(){const n=(S.name||"").trim()||(acct&&acct.user.email)||"";return n?n[0].toUpperCase():""}
+function avatarHTML(){const a=S.profile&&S.profile.avatar;if(a)return `<span class="avatar"><img src="${esc(a)}" alt=""></span>`;const i=initialOf();return i?`<span class="avatar">${esc(i)}</span>`:`<span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.3-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg></span>`}
+function updateMe(){
+  const b=$("#meBtn");if(!b)return;
+  if(acct){b.className="me-btn in";b.innerHTML=avatarHTML();b.setAttribute("aria-label","Your profile and account")}
+  else if(ACCOUNTS){b.className="me-btn out";b.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.3-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg><span>Log in</span>`;b.setAttribute("aria-label","Log in or create an account")}
+  else{b.className="me-btn in";b.innerHTML=avatarHTML();b.setAttribute("aria-label","Your profile")}
+  b.setAttribute("aria-current",tab==="profile"?"page":"false");
+}
+function viewProfile(){
+  const has=!!(S.profile&&S.profile.avatar);
+  let h=`<div class="prof-head">
+    <button class="prof-pic" data-act="pickavatar" aria-label="${has?"Change":"Add"} your profile picture">${avatarHTML()}<span class="cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>
+    <input type="file" id="avatarIn" accept="image/*" hidden>
+    <h2>${esc(S.name||"Your profile")}</h2>
+    <p class="t-sub">${acct?esc(acct.user.email):ACCOUNTS?"Not logged in":"On this device"}</p>
+  </div>
+  <div class="card"><strong>You</strong>
+    <label class="field" style="margin:10px 0 12px"><span>What should Proof call you?</span><input id="nameIn" value="${esc(S.name)}" placeholder="Your name" maxlength="40"></label>
+    <div class="row"><button class="btn quiet" data-act="pickavatar">${has?"Change photo":"Add a profile photo"}</button>${has?`<button class="btn ghost" data-act="rmavatar">Remove photo</button>`:""}</div>
+    <p class="t-sub" style="margin:10px 0 0">${acct?"Your photo and name sync to every device where you log in.":"Your photo stays on this device"+(ACCOUNTS?" until you log in.":".")}</p>
+  </div>`;
+  h+=accountCard();
+  return h;
+}
+async function setAvatar(file){
+  try{
+    const url=URL.createObjectURL(file);const im=new Image();im.src=url;await im.decode();
+    const s=Math.min(im.naturalWidth,im.naturalHeight),c=document.createElement("canvas");c.width=c.height=256;
+    c.getContext("2d").drawImage(im,(im.naturalWidth-s)/2,(im.naturalHeight-s)/2,s,s,0,0,256,256);URL.revokeObjectURL(url);
+    S.profile=Object.assign({},S.profile,{avatar:c.toDataURL("image/jpeg",.85)});persist();render();toast("Looking good.");
+  }catch(e){toast("That image couldn't be opened here. Try a JPG or PNG.")}
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const act=b.dataset.act;
+  if(act==="profile"){goTab("profile");return}
+  if(act==="pickavatar"){$("#avatarIn")?.click();return}
+  if(act==="rmavatar"){S.profile=Object.assign({},S.profile);delete S.profile.avatar;persist();render();toast("Photo removed.");return}
+});
+document.addEventListener("change",e=>{if(e.target.id==="avatarIn"){const f=e.target.files[0];e.target.value="";if(f)setAvatar(f)}});
 
 /* ---------- skies ---------- */
 const SKIES={
@@ -2233,7 +2293,7 @@ document.addEventListener("click",e=>{
   if(!welcome)return;const b=e.target.closest("[data-wel]");if(!b)return;e.stopImmediatePropagation();const a=b.dataset.wel;
   if(a==="next")welStep(1);
   else if(a==="tour"){closeWelcome(true);startTour()}
-  else if(a==="signin"){closeWelcome(true);tab="settings";render();const c=$("#account");c&&c.scrollIntoView({block:"center"});document.querySelector('[data-form="acctemail"] input')?.focus()}
+  else if(a==="signin"){closeWelcome(true);tab="profile";render();const c=$("#account");c&&c.scrollIntoView({block:"center"});document.querySelector('[data-form="acctlogin"] input')?.focus()}
   else if(a==="skipname")welStep(2);
   else if(a==="chip"){const f=b.closest("form");f.elements.title.value=b.dataset.v;f.elements.belief.focus()}
   else if(a==="done"||a==="tinydone"||a==="later"){
@@ -2271,7 +2331,7 @@ function viewSettings(){
     ${[["step","Everyday steps","#F6D98B"],["win","Proud moments","#FFD3E4"],["ms","Milestones","#FFF3C9"]].map(([k,label,c])=>`<p class="shape-label">${label}</p><div class="shapes" role="group" aria-label="${label} star shape">${Object.entries(SHAPES).map(([sh,name])=>`<button class="shapeopt" data-act="starShape" data-kind="${k}" data-id="${sh}" aria-pressed="${shapeOf(k)===sh}" title="${name}"><svg viewBox="0 0 40 40" aria-hidden="true">${shapeSVG(sh,20,20,sh==="dot"?7:sh==="sparkle"?15:12,c)}</svg><span>${name}</span></button>`).join("")}</div>`).join("")}
   </div>
   <div class="card"><strong>New to Proof?</strong><p class="t-sub" style="margin:4px 0 12px">Walk through everything Proof can do on a sample sky. Your own stars stay exactly as they are.</p><button class="btn quiet" data-act="tour">Take the tour</button></div>
-  <div class="card"><strong>You</strong><label class="field" style="margin:10px 0 0"><span>What should Proof call you?</span><input id="nameIn" value="${esc(S.name)}" placeholder="Your name" maxlength="40"></label></div>`;
+  <div class="card"><strong>Your profile${ACCOUNTS?" and account":""}</strong><p class="t-sub" style="margin:4px 0 12px">${acct?"Logged in as "+esc(acct.user.email)+". ":""}Your name, your photo${ACCOUNTS?", logging in and syncing":""} live on your profile, from the button at the top right.</p><button class="btn quiet" data-act="profile">Open my profile</button></div>`;
   if(desk&&deskSettings){
     const d=deskSettings;
     h+=`<div class="card"><strong>On this computer</strong>
@@ -2284,7 +2344,6 @@ function viewSettings(){
       <label class="field" style="margin:4px 0 0"><span>At what time?</span><input type="time" data-desk-time="1" value="${esc(d.reminderTime||"19:00")}" ${d.reminderOn?"":"disabled"} style="max-width:180px"></label>
     </div>`;
   }else h+=`<div class="card"><strong>A gentle daily nudge</strong><p class="t-sub" style="margin:4px 0 0">Daily reminders are part of the desktop app, where Proof can send a kind Windows notification at a time you choose.</p></div>`;
-  h+=accountCard();
   h+=`<div class="card"><strong>Your data</strong><p class="t-sub" style="margin:4px 0 12px">${acct?"Everything is saved on this device and synced to your account.":desk?"Everything is saved on this computer.":dbRef?"Everything is saved to your account and shows up on every device.":"Everything is saved on this device."} Backups include your photos, so you can move everything to another device or version of Proof.</p>
     <div class="row"><button class="btn quiet" data-act="export">Save a backup</button><label class="btn ghost" style="cursor:pointer">Restore a backup<input type="file" id="importIn" accept=".json,application/json" hidden></label></div></div>`;
   return h;
@@ -2335,10 +2394,10 @@ function confetti(){
 function stopConfetti(){cancelAnimationFrame(confRAF);$("#confetti")?.remove()}
 
 function render(){
-  headline();drawSky();
+  headline();drawSky();updateMe();
   document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
   document.querySelectorAll("#drawer [data-tab]").forEach(b=>b.dataset.tab===tab?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
-  const V={home:viewHome,priorities:viewPriorities,milestones:viewMilestones,photos:viewPhotos,progress:viewProgress,reflect:viewCheckpoints,settings:viewSettings};
+  const V={home:viewHome,priorities:viewPriorities,milestones:viewMilestones,photos:viewPhotos,progress:viewProgress,reflect:viewCheckpoints,settings:viewSettings,profile:viewProfile};
   $("#view").innerHTML=(V[tab]||viewHome)();
   if(noteFor){const n=document.querySelector(`[data-note="${noteFor}"]`);n&&n.focus({preventScroll:true})}
   if(tour)requestAnimationFrame(tourPlace);
@@ -2619,7 +2678,7 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden){hiddenAt=D
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!document.activeElement?.matches?.("input,textarea,select")&&!$("#modal").innerHTML)render()});
 
 loadLocal();loadAcct();migrate();render();connect();syncLabel();if(acct)syncNow();
-setTimeout(()=>{if(location.hash==="#account"&&ACCOUNTS){history.replaceState(null,"",location.pathname+location.search);tab="settings";render();const c=$("#account");c&&c.scrollIntoView({block:"center"});document.querySelector('[data-form="acctemail"] input')?.focus()}else if(location.hash==="#tour"){history.replaceState(null,"",location.pathname+location.search);startTour()}else if(!S.onboarded&&!S.priorities.length&&!S.tasks.length&&!tour)openWelcome(0)},dbRef?0:350);
+setTimeout(()=>{if(location.hash==="#account"&&ACCOUNTS){history.replaceState(null,"",location.pathname+location.search);tab="profile";render();const c=$("#account");c&&c.scrollIntoView({block:"center"});document.querySelector('[data-form="acctlogin"] input')?.focus()}else if(location.hash==="#tour"){history.replaceState(null,"",location.pathname+location.search);startTour()}else if(!S.onboarded&&!S.priorities.length&&!S.tasks.length&&!tour)openWelcome(0)},dbRef?0:350);
 if(desk)desk.getSettings().then(d=>{deskSettings=d;syncLabel();if(tab==="settings")render()}).catch(()=>{});
 
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){try{navigator.serviceWorker.register("proof-sw.js").catch(()=>{})}catch(e){}}
