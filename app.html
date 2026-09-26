@@ -535,6 +535,12 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 .quotes-list li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:flex-start}
 .quotes-list li:first-child{border-top:0}
 .quotes-list q{flex:1}
+.acct-choices{display:flex;flex-direction:column;gap:10px}
+.acct-choice{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;padding:14px 16px;cursor:pointer;font:inherit}
+.acct-choice:hover,.acct-choice:focus-visible{border-color:var(--accent)}
+.acct-choice span{font-size:14px;color:var(--muted)}
+.acct-del{background:none;border:0;padding:0;color:var(--muted);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer}
+.btn.acct-danger{background:#B4495A;color:#fff}
 </style>
 </head>
 <body>
@@ -826,6 +832,7 @@ let saveTimer=null,saving=Promise.resolve();
 function persist(){
   if(tour)return; // the tour runs on a sample sky that is never saved
   try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}
+  markDirty();
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
     if(!dbRef)return;
@@ -884,6 +891,293 @@ async function deletePhotos(ids){
   for(const ph of gone){try{if(ph.asset&&assetsNS)await assetsNS.delete(ph.asset);else if(!ph.asset)await IDB.del(ph.id)}catch(err){}if(photoURLs[ph.id]){URL.revokeObjectURL(photoURLs[ph.id]);delete photoURLs[ph.id]}}
 }
 async function photoBlob(ph){if(ph.asset){const r=await fetch(photoSrc(ph));return await r.blob()}return await IDB.get(ph.id)}
+
+
+/* ---------- account & sync (Supabase) ---------- */
+const SB={url:"https://hdvbxzggyfqjhpaiafwz.supabase.co",key:"sb_publishable_uooNqCp9o-lIBYPzc7P1bQ_td4oNXbj"};
+const ACCOUNTS=!(window.claude&&window.claude.use); // the Claude artifact version keeps its own sync
+let acct=null,sync={rev:0,dirty:false,at:0},syncBase=null,syncing=null,syncAgain=false,syncTimer=null,syncStatus="",acctFlow=null,renderLater=false,refreshing=null;
+class SBErr extends Error{constructor(m,s){super(m);this.status=s||0}}
+function loadAcct(){try{acct=JSON.parse(localStorage.getItem("proof-account")||"null");sync=Object.assign({rev:0,dirty:false,at:0},JSON.parse(localStorage.getItem("proof-sync")||"{}"));syncBase=JSON.parse(localStorage.getItem("proof-sync-base")||"null")}catch(e){acct=null}if(!ACCOUNTS)acct=null}
+function saveAcct(){try{acct?localStorage.setItem("proof-account",JSON.stringify(acct)):localStorage.removeItem("proof-account")}catch(e){}}
+function saveSync(){try{localStorage.setItem("proof-sync",JSON.stringify(sync))}catch(e){}}
+function setBase(st){syncBase=st??null;try{st?localStorage.setItem("proof-sync-base",JSON.stringify(st)):localStorage.removeItem("proof-sync-base")}catch(e){}}
+function clearSync(){sync={rev:0,dirty:false,at:0};setBase(null);try{localStorage.removeItem("proof-sync")}catch(e){}}
+const snapshot=()=>JSON.parse(JSON.stringify(S));
+const hasContent=st=>!!st&&["priorities","tasks","photos","wins","checkpoints","milestones","letters","pastNotes"].some(k=>(st[k]||[]).length);
+
+/* comparing and combining two copies of a sky */
+function stable(v){if(Array.isArray(v))return "["+v.map(stable).join(",")+"]";if(v&&typeof v==="object")return "{"+Object.keys(v).filter(k=>v[k]!==undefined).sort().map(k=>JSON.stringify(k)+":"+stable(v[k])).join(",")+"}";return JSON.stringify(v===undefined?null:v)}
+const same=(a,b)=>stable(a)===stable(b);
+const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
+const idList=arr=>arr.every(x=>isObj(x)&&x.id!=null);
+function mergeVal(o,x,y){
+  if(x===undefined&&y===undefined)return undefined;
+  if(x===undefined)return o!==undefined&&same(o,y)?undefined:y; // deleted here, or new/changed there
+  if(y===undefined)return o!==undefined&&same(o,x)?undefined:x;
+  return merge3(o,x,y);
+}
+// Three-way merge: base = the copy both sides last agreed on. Changes from both sides are kept;
+// when both changed the very same value, this device wins.
+function merge3(base,a,b){
+  if(same(a,b))return a;
+  if(base!==undefined&&same(base,a))return b;
+  if(base!==undefined&&same(base,b))return a;
+  if(Array.isArray(a)&&Array.isArray(b)){
+    const B=Array.isArray(base)?base:[];
+    if(idList(a)&&idList(b)&&idList(B)){
+      const m=arr=>new Map(arr.map(x=>[String(x.id),x])),MA=m(a),MB=m(b),MO=m(B),out=[],seen=new Set();
+      for(const k of [...a.map(x=>String(x.id)),...b.map(x=>String(x.id))]){if(seen.has(k))continue;seen.add(k);const v=mergeVal(MO.get(k),MA.get(k),MB.get(k));if(v!==undefined)out.push(v)}
+      return out;
+    }
+    const ks=arr=>new Set(arr.map(stable)),KA=ks(a),KB=ks(b),KO=ks(B),out=[],seen=new Set();
+    for(const x of a){const k=stable(x);if(seen.has(k))continue;if(KB.has(k)||!KO.has(k)){out.push(x);seen.add(k)}}
+    for(const x of b){const k=stable(x);if(seen.has(k)||KA.has(k)||KO.has(k))continue;out.push(x);seen.add(k)}
+    if(out.length&&out.every(x=>isObj(x)&&typeof x.at==="number"))out.sort((p,q)=>p.at-q.at);
+    return out;
+  }
+  if(isObj(a)&&isObj(b)){
+    const O=isObj(base)?base:{},out={};
+    for(const k of new Set([...Object.keys(a),...Object.keys(b)])){const v=mergeVal(O[k],a[k],b[k]);if(v!==undefined)out[k]=v}
+    return out;
+  }
+  return a;
+}
+// After combining two unrelated skies, fold categories with the same name into one.
+function dedupeNamed(st){
+  for(const [list,refs] of [["categories",[["priorities","cat"]]],["photoCats",[["photos","cat"]]]]){
+    const byName={},remap={};
+    st[list]=(st[list]||[]).filter(c=>{const n=String(c.name||"").trim().toLowerCase();if(byName[n]){remap[c.id]=byName[n];return false}byName[n]=c.id;return true});
+    for(const [coll,key] of refs)(st[coll]||[]).forEach(x=>{if(remap[x[key]])x[key]=remap[x[key]]});
+  }
+  return st;
+}
+
+/* talking to Supabase */
+function setSession(j){acct={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:{id:j.user.id,email:j.user.email}};saveAcct()}
+function refreshSession(){
+  if(refreshing)return refreshing;
+  return refreshing=(async()=>{
+    try{
+      const stored=JSON.parse(localStorage.getItem("proof-account")||"null"); // another tab may have refreshed already
+      if(stored&&acct&&stored.refresh_token!==acct.refresh_token){acct=stored;if(acct.expires_at*1000-60000>Date.now())return}
+      let r;
+      try{r=await fetch(SB.url+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:SB.key,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:acct.refresh_token})})}catch(e){throw new SBErr("offline")}
+      if(r.status===400||r.status===401||r.status===403){signedOutRemotely();throw new SBErr("signedout",r.status)}
+      if(!r.ok)throw new SBErr("offline",r.status);
+      setSession(await r.json());
+    }finally{refreshing=null}
+  })();
+}
+async function accessToken(){if(!acct)throw new SBErr("signedout");if(acct.expires_at*1000-60000<=Date.now())await refreshSession();if(!acct)throw new SBErr("signedout");return acct.access_token}
+async function sbReq(path,{method="GET",body,headers={},auth=true,raw=false}={},retry=true){
+  const h=Object.assign({apikey:SB.key},headers);let data=body;
+  if(body!==undefined&&!(body instanceof Blob)){h["Content-Type"]="application/json";data=JSON.stringify(body)}
+  if(auth)h.Authorization="Bearer "+(await accessToken());
+  let r;try{r=await fetch(SB.url+path,{method,headers:h,body:data})}catch(e){throw new SBErr("offline")}
+  if(r.status===401&&auth&&retry){await refreshSession();return sbReq(path,{method,body,headers,auth,raw},false)}
+  if(!r.ok){let msg="";try{const j=await r.json();msg=j.msg||j.message||j.error_description||j.error||""}catch(e){}throw new SBErr(msg||"HTTP "+r.status,r.status)}
+  if(raw)return r;
+  const t=await r.text();return t?JSON.parse(t):null;
+}
+const sendCode=email=>sbReq("/auth/v1/otp",{method:"POST",body:{email,create_user:true},auth:false});
+async function verifyCode(email,token){setSession(await sbReq("/auth/v1/verify",{method:"POST",body:{type:"email",email,token},auth:false}))}
+const fetchSky=async()=>((await sbReq(`/rest/v1/skies?select=state,rev&user_id=eq.${acct.user.id}`))||[])[0]||null;
+function signedOutRemotely(){acct=null;saveAcct();clearSync();syncStatus="";syncLabel();if(tab==="settings")softRender();toast("You've been signed out. Your sky is still here on this device. Sign in again to keep syncing.")}
+
+/* keeping this device and the account in step */
+function applyRemote(st){
+  const before=S.photos.filter(p=>!p.asset).map(p=>p.id);
+  S=Object.assign(EMPTY(),JSON.parse(JSON.stringify(st)));migrate();
+  const now=new Set(S.photos.map(p=>p.id));
+  for(const id of before)if(!now.has(id)){IDB.del(id).catch(()=>{});if(photoURLs[id]){URL.revokeObjectURL(photoURLs[id]);delete photoURLs[id]}} // deleted on another device
+  try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}
+  if(welcome&&(S.priorities.length||S.onboarded))closeWelcome(true);
+  softRender();
+}
+const uiBusy=()=>!!(document.activeElement?.matches?.("input,textarea,select")||$("#modal").innerHTML||(typeof story!=="undefined"&&story)||tour||welcome);
+function softRender(){if(uiBusy()){renderLater=true;return}renderLater=false;render()}
+function markDirty(){if(!acct||tour)return;sync.dirty=true;saveSync();syncLabel();clearTimeout(syncTimer);syncTimer=setTimeout(syncNow,2500)}
+async function firstSync(){
+  sync.needsFirst=true;saveSync();
+  const row=await fetchSky();
+  if(!row){sync={rev:0,dirty:true,at:0};setBase(null)}
+  else if(!hasContent(S)||same(snapshot(),row.state)){applyRemote(row.state);sync={rev:row.rev,dirty:false,at:0};setBase(row.state)}
+  else return {choose:row};
+  saveSync();await syncNow();return row?"restored":"new";
+}
+function resolveFirst(choice,row){
+  if(choice==="account"){applyRemote(row.state);sync={rev:row.rev,dirty:false,at:0}}
+  else if(choice==="device"){sync={rev:row.rev,dirty:true,at:0}}
+  else{const m=dedupeNamed(merge3(undefined,snapshot(),row.state));m.onboarded=!!(S.onboarded||row.state.onboarded);m.seeded=true;applyRemote(m);sync={rev:row.rev,dirty:true,at:0}}
+  setBase(row.state);saveSync();closeModal();render();syncNow();
+  toast(choice==="account"?"Done. This device now shows your account's sky.":choice==="device"?"Done. Your account now matches this device.":"Combined. Everything from both is in your sky now.");
+}
+function openFirstChoice(row){
+  if($("#modal").innerHTML)return;
+  window.__firstRow=row;
+  const n=st=>st.tasks.reduce((a,t)=>a+(t.log||[]).length,0);
+  openModal(`<div style="padding:6px"><h2 style="margin-top:4px">Your account already has a sky</h2>
+    <p class="t-sub" style="margin:0 0 16px">Your account has ${plural(n(row.state),"star")} from steps, and this device has ${plural(n(S),"star")}. What should Proof do?</p>
+    <div class="acct-choices">
+      <button class="acct-choice" data-act="firstchoice" data-id="combine"><strong>Combine them</strong><span>Keeps everything from both. Nothing is lost.</span></button>
+      <button class="acct-choice" data-act="firstchoice" data-id="account"><strong>Use my account's sky</strong><span>Replaces what's on this device with your account's sky.</span></button>
+      <button class="acct-choice" data-act="firstchoice" data-id="device"><strong>Keep this device's sky</strong><span>Replaces your account's sky with this one.</span></button>
+    </div></div>`);
+}
+function syncNow(){
+  if(!acct||tour)return Promise.resolve();
+  if(syncing){syncAgain=true;return syncing}
+  syncing=(async()=>{
+    try{
+      if(sync.needsFirst){const res=await firstSync();if(res&&res.choose){syncStatus="";syncLabel();openFirstChoice(res.choose)}return}
+      syncStatus="syncing";syncLabel();
+      for(let i=0;i<5;i++){
+        const row=await fetchSky(),srev=row?row.rev:0;
+        if(!row&&sync.rev>0){sync.rev=0;sync.dirty=true;setBase(null);continue} // the account's copy went missing: put ours back
+        if(srev===sync.rev){
+          if(!sync.dirty)break;
+          const snap=snapshot();
+          const nr=await sbReq("/rest/v1/rpc/save_sky",{method:"POST",body:{new_state:snap,base_rev:sync.rev}});
+          if(nr==null)continue; // another device saved first: fetch it and combine
+          sync.rev=nr;if(same(snap,snapshot()))sync.dirty=false;setBase(snap);saveSync();break;
+        }
+        if(!sync.dirty){applyRemote(row.state);sync.rev=srev;setBase(row.state);sync.dirty=!same(snapshot(),row.state);saveSync();if(!sync.dirty)break;continue}
+        const merged=merge3(syncBase===null?undefined:syncBase,snapshot(),row.state);
+        applyRemote(merged);sync.rev=srev;setBase(row.state);sync.dirty=!same(merged,row.state);saveSync();
+        if(!sync.dirty)break;
+      }
+      await syncPhotos();
+      sync.at=Date.now();saveSync();syncStatus="";
+    }catch(e){syncStatus=e.message==="signedout"?"":"offline"}
+    finally{
+      syncing=null;syncLabel();
+      if(syncAgain){syncAgain=false;setTimeout(syncNow,400)}
+    }
+  })();
+  return syncing;
+}
+async function syncPhotos(){
+  if(!acct)return;const uid=acct.user.id;
+  const listed=await sbReq("/storage/v1/object/list/photos",{method:"POST",body:{prefix:uid,limit:10000,offset:0}});
+  const remote=new Set((listed||[]).filter(o=>o.id!==null).map(o=>o.name));
+  const mine=S.photos.filter(p=>!p.asset),ids=new Set(mine.map(p=>p.id));
+  for(const ph of mine){
+    let local=null;try{local=await IDB.get(ph.id)}catch(e){}
+    try{
+    if(local&&!remote.has(ph.id)){await sbReq(`/storage/v1/object/photos/${uid}/${ph.id}`,{method:"POST",body:local,headers:{"Content-Type":local.type||"image/jpeg","x-upsert":"true"}})}
+    else if(!local&&remote.has(ph.id)){
+      const r=await sbReq(`/storage/v1/object/authenticated/photos/${uid}/${ph.id}`,{raw:true});const blob=await r.blob();
+      await IDB.put(ph.id,blob);photoURLs[ph.id]=URL.createObjectURL(blob);document.querySelectorAll(`img[data-ph="${ph.id}"]`).forEach(i=>i.src=photoURLs[ph.id]);
+    }
+    }catch(e){if(e.message==="offline"||e.message==="signedout")throw e} // one stubborn photo shouldn't stop the rest
+  }
+  if(!sync.dirty){const gone=[...remote].filter(n=>!ids.has(n));if(gone.length)await sbReq("/storage/v1/object/photos",{method:"DELETE",body:{prefixes:gone.map(n=>uid+"/"+n)}})}
+}
+function ago(t){const s=(Date.now()-t)/1000;if(s<45)return "just now";if(s<3600)return plural(Math.round(s/60),"minute")+" ago";if(s<86400)return plural(Math.round(s/3600),"hour")+" ago";return fmtDate(t)}
+function syncText(){
+  if(syncStatus==="syncing")return "Syncing…";
+  if(syncStatus==="offline")return "Can't reach the internet right now. Everything is saved here and will sync when you're back online.";
+  if(sync.needsFirst)return "Waiting for you to choose how to combine your skies.";
+  if(sync.dirty)return "Saved here. Syncing in a moment.";
+  return sync.at?"Last synced "+ago(sync.at)+".":"Not synced yet.";
+}
+function syncLabel(){
+  const el=$("#syncState");
+  if(el)el.textContent=!acct?(desk?"Saved on this computer":dbRef?"Saved to your account, on every device":"Saved on this device"):syncStatus==="syncing"?"Syncing…":syncStatus==="offline"?"Offline. Saved here, will sync later":sync.dirty?"Saved here, syncing soon":"Synced to your account";
+  const st=$("#acctStatus");if(st)st.textContent=syncText();
+}
+function accountCard(){
+  if(!ACCOUNTS)return "";
+  if(acct)return `<div class="card" id="account"><strong>Your account</strong>
+    <p class="t-sub" style="margin:4px 0 10px">Signed in as <b>${esc(acct.user.email)}</b>. Your sky syncs to every device where you sign in.</p>
+    <p class="t-sub" style="margin:0 0 12px" id="acctStatus">${esc(syncText())}</p>
+    <div class="row">${sync.needsFirst?`<button class="btn" data-act="syncnow">Choose how to combine</button>`:`<button class="btn quiet" data-act="syncnow">Sync now</button>`}<button class="btn ghost" data-act="signout">Sign out</button></div>
+    <p style="margin:14px 0 0"><button class="acct-del" data-act="delacct">Delete my account</button></p></div>`;
+  if(acctFlow&&acctFlow.sent)return `<div class="card" id="account"><strong>Check your email</strong>
+    <p class="t-sub" style="margin:4px 0 12px">We sent a sign-in code to <b>${esc(acctFlow.email)}</b>. It can take a minute, and it's worth checking your spam folder.</p>
+    <form data-form="acctcode"><label class="field" style="margin:0 0 12px"><span>Your code</span><input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="123456" required style="max-width:220px;letter-spacing:.2em"></label>
+    <div class="row"><button class="btn" type="submit">Sign in</button><button class="btn ghost" type="button" data-act="acctresend">Send a new code</button><button class="btn ghost" type="button" data-act="acctback">Use a different email</button></div></form></div>`;
+  return `<div class="card" id="account"><strong>Sync across your devices</strong>
+    <p class="t-sub" style="margin:4px 0 12px">Sign in with your email to keep your sky on your phone, your computer and the web. There's no password: we'll email you a code. Proof works exactly the same without an account.</p>
+    <form data-form="acctemail"><label class="field" style="margin:0 0 12px"><span>Your email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com" value="${esc(acctFlow?.email||"")}"></label>
+    <button class="btn" type="submit">Email me a code</button></form></div>`;
+}
+function authErr(e,verify){
+  if(e.message==="offline")return "Proof can't reach the internet right now. Try again when you're connected.";
+  if(e.status===429)return "That's a lot of tries in a row. Wait a minute, then try again.";
+  if(verify&&(e.status===400||e.status===401||e.status===403))return "That code didn't work. It may have expired, so send yourself a new one.";
+  return "Something went wrong signing in. Try again in a moment.";
+}
+function busyBtn(f,on){const b=f&&f.querySelector('button[type="submit"]');if(b){b.disabled=on;b.style.opacity=on?.6:""}}
+async function signOut(clear){
+  closeModal();
+  if(sync.dirty&&!sync.needsFirst){try{await Promise.race([syncNow(),new Promise(r=>setTimeout(r,6000))])}catch(e){}}
+  try{await sbReq("/auth/v1/logout",{method:"POST"},false)}catch(e){}
+  acct=null;saveAcct();clearSync();syncStatus="";acctFlow=null;
+  if(clear){
+    for(const ph of S.photos){try{await IDB.del(ph.id)}catch(e){}if(photoURLs[ph.id]){URL.revokeObjectURL(photoURLs[ph.id]);delete photoURLs[ph.id]}}
+    S=EMPTY();migrate();try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}
+    render();syncLabel();toast("Signed out, and this device is cleared. Your sky is safe in your account.");
+  }else{render();syncLabel();toast("Signed out. Your sky is still on this device, and safe in your account.")}
+}
+async function deleteAccount(){
+  closeModal();toast("Deleting your account…");
+  try{
+    const uid=acct.user.id;
+    const listed=await sbReq("/storage/v1/object/list/photos",{method:"POST",body:{prefix:uid,limit:10000,offset:0}});
+    const names=(listed||[]).filter(o=>o.id!==null).map(o=>uid+"/"+o.name);
+    if(names.length)await sbReq("/storage/v1/object/photos",{method:"DELETE",body:{prefixes:names}});
+    await sbReq("/rest/v1/rpc/delete_my_account",{method:"POST",body:{}});
+  }catch(e){toast(e.message==="offline"?"Proof can't reach the internet, so your account wasn't deleted. Try again when you're connected.":"Your account couldn't be deleted just now. Try again in a moment.");return}
+  acct=null;saveAcct();clearSync();syncStatus="";render();syncLabel();
+  toast("Your account is deleted. Your sky is still here on this device.");
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const act=b.dataset.act;
+  if(act==="syncnow"&&sync.needsFirst){syncNow();return}
+  if(act==="syncnow"){syncNow().then(()=>toast(syncStatus==="offline"?"Couldn't reach the internet. Proof will try again soon.":"Your sky is up to date."));syncLabel();return}
+  if(act==="acctback"){acctFlow={email:acctFlow?.email||""};render();document.querySelector('[data-form="acctemail"] input')?.focus();return}
+  if(act==="acctresend"){const em=acctFlow?.email;if(!em)return;sendCode(em).then(()=>toast("A new code is on its way.")).catch(err=>toast(authErr(err)));return}
+  if(act==="firstchoice"){const row=window.__firstRow;if(row)resolveFirst(b.dataset.id,row);return}
+  if(act==="signout"){openModal(`<div style="padding:6px"><h2 style="margin-top:4px">Sign out of Proof?</h2><p class="t-sub" style="margin:0 0 16px">Your sky stays safe in your account. Sign in again anytime to pick up where you left off.</p>
+    <div class="acct-choices"><button class="acct-choice" data-act="signoutkeep"><strong>Sign out</strong><span>Keep my sky on this device too.</span></button>
+    <button class="acct-choice" data-act="signoutclear"><strong>Sign out and clear this device</strong><span>Good for a shared or borrowed computer.</span></button></div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" data-act="closemodal">Cancel</button></div></div>`);return}
+  if(act==="signoutkeep"){signOut(false);return}
+  if(act==="signoutclear"){signOut(true);return}
+  if(act==="delacct"){openModal(`<div style="padding:6px"><h2 style="margin-top:4px">Delete your account?</h2><p class="t-sub" style="margin:0 0 16px">This permanently deletes your account and everything stored in it, including your synced photos. It can't be undone. Proof keeps working on this device, just without sync.</p>
+    <div class="row"><button class="btn acct-danger" data-act="delacctyes">Delete my account</button><button class="btn ghost" data-act="closemodal">Keep my account</button></div></div>`);return}
+  if(act==="delacctyes"){deleteAccount();return}
+});
+document.addEventListener("submit",async e=>{
+  const f=e.target,k=f.dataset&&f.dataset.form;if(k!=="acctemail"&&k!=="acctcode")return;
+  e.preventDefault();e.stopImmediatePropagation();const F=f.elements;
+  if(k==="acctemail"){
+    const email=F.email.value.trim().toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast("That email doesn't look quite right. Check it and try again.");return}
+    busyBtn(f,true);
+    try{await sendCode(email);acctFlow={email,sent:true};render();document.querySelector('[data-form="acctcode"] input')?.focus();toast("Code sent. Check your email.")}
+    catch(err){busyBtn(f,false);toast(authErr(err))}
+    return;
+  }
+  const code=F.code.value.replace(/\D/g,"");if(code.length<6){toast("Enter the code from your email.");return}
+  busyBtn(f,true);
+  try{await verifyCode(acctFlow.email,code)}catch(err){busyBtn(f,false);toast(authErr(err,true));return}
+  acctFlow=null;syncStatus="syncing";$("#toast").classList.remove("show");render();
+  try{
+    const res=await firstSync();
+    if(res&&res.choose){syncStatus="";render();openFirstChoice(res.choose);return}
+    render();toast(res==="restored"?"Welcome back. Your sky is here.":"Signed in. Your sky now syncs to your account.");
+  }catch(err){syncStatus="offline";render();toast("Signed in. Proof will sync as soon as it can reach the internet.")}
+},true);
+setInterval(()=>{
+  if(renderLater&&!uiBusy()){renderLater=false;render()}
+  if(acct&&!document.hidden&&!syncing&&!sync.needsFirst&&Date.now()-sync.at>60000)syncNow();
+},15000);
+document.addEventListener("focusout",()=>setTimeout(()=>{if(renderLater&&!uiBusy()){renderLater=false;render()}},300));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&acct)syncNow()});
+addEventListener("online",()=>{if(acct)syncNow()});
+addEventListener("storage",e=>{if(e.key==="proof-account"){try{acct=JSON.parse(e.newValue||"null")}catch(err){}syncLabel()}});
 
 /* ---------- skies ---------- */
 const SKIES={
@@ -1904,7 +2198,7 @@ function welStep(n){
   const P=S.priorities.find(p=>p.id===w.pid),T0=S.tasks.find(t=>t.id===w.tid);
   const views=[
     `${dots}<h1>Welcome to Proof.</h1><p>A kind place to keep small promises to yourself. Every one you keep becomes a star, and over time your sky fills with evidence of who you are.</p>
-      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button></div>`,
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button>${ACCOUNTS?`<button class="btn ghost" data-wel="signin">I already use Proof. Sign in</button>`:""}</div>`,
     `${dots}<h2>What should Proof call you?</h2><p>Just a first name or a nickname. You can skip this.</p>
       <form data-welform="name"><label class="field"><span>Your name</span><input name="name" maxlength="40" value="${esc(w.name)}" autocomplete="given-name"></label>
       <div class="row"><button class="btn" type="submit">Next</button><button class="skip" type="button" data-wel="skipname">Skip</button></div></form>`,
@@ -1927,6 +2221,7 @@ document.addEventListener("click",e=>{
   if(!welcome)return;const b=e.target.closest("[data-wel]");if(!b)return;e.stopImmediatePropagation();const a=b.dataset.wel;
   if(a==="next")welStep(1);
   else if(a==="tour"){closeWelcome(true);startTour()}
+  else if(a==="signin"){closeWelcome(true);tab="settings";render();const c=$("#account");c&&c.scrollIntoView({block:"center"});document.querySelector('[data-form="acctemail"] input')?.focus()}
   else if(a==="skipname")welStep(2);
   else if(a==="chip"){const f=b.closest("form");f.elements.title.value=b.dataset.v;f.elements.belief.focus()}
   else if(a==="done"||a==="tinydone"||a==="later"){
@@ -1977,7 +2272,8 @@ function viewSettings(){
       <label class="field" style="margin:4px 0 0"><span>At what time?</span><input type="time" data-desk-time="1" value="${esc(d.reminderTime||"19:00")}" ${d.reminderOn?"":"disabled"} style="max-width:180px"></label>
     </div>`;
   }else h+=`<div class="card"><strong>A gentle daily nudge</strong><p class="t-sub" style="margin:4px 0 0">Daily reminders are part of the desktop app, where Proof can send a kind Windows notification at a time you choose.</p></div>`;
-  h+=`<div class="card"><strong>Your data</strong><p class="t-sub" style="margin:4px 0 12px">${desk?"Everything is saved on this computer.":dbRef?"Everything is saved to your account and shows up on every device.":"Everything is saved on this device."} Backups include your photos, so you can move everything to another device or version of Proof.</p>
+  h+=accountCard();
+  h+=`<div class="card"><strong>Your data</strong><p class="t-sub" style="margin:4px 0 12px">${acct?"Everything is saved on this device and synced to your account.":desk?"Everything is saved on this computer.":dbRef?"Everything is saved to your account and shows up on every device.":"Everything is saved on this device."} Backups include your photos, so you can move everything to another device or version of Proof.</p>
     <div class="row"><button class="btn quiet" data-act="export">Save a backup</button><label class="btn ghost" style="cursor:pointer">Restore a backup<input type="file" id="importIn" accept=".json,application/json" hidden></label></div></div>`;
   return h;
 }
@@ -2310,9 +2606,9 @@ let rz;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(drawSky,150
 document.addEventListener("visibilitychange",()=>{if(document.hidden){hiddenAt=Date.now()}else if(hiddenAt&&Date.now()-hiddenAt>5*60*1000&&photoLock()){photosUnlocked=false;if(tab==="photos"||tab==="home"){closeModal();render()}}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!document.activeElement?.matches?.("input,textarea,select")&&!$("#modal").innerHTML)render()});
 
-loadLocal();migrate();render();connect();
+loadLocal();loadAcct();migrate();render();connect();syncLabel();if(acct)syncNow();
 setTimeout(()=>{if(location.hash==="#tour"){history.replaceState(null,"",location.pathname+location.search);startTour()}else if(!S.onboarded&&!S.priorities.length&&!S.tasks.length&&!tour)openWelcome(0)},dbRef?0:350);
-if(desk)desk.getSettings().then(d=>{deskSettings=d;$("#syncState").textContent="Saved on this computer";if(tab==="settings")render()}).catch(()=>{});
+if(desk)desk.getSettings().then(d=>{deskSettings=d;syncLabel();if(tab==="settings")render()}).catch(()=>{});
 
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){try{navigator.serviceWorker.register("proof-sw.js").catch(()=>{})}catch(e){}}
 </script>
