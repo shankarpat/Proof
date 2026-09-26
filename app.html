@@ -410,6 +410,42 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 .pastnote-card{background:linear-gradient(160deg,var(--surface),color-mix(in srgb,#F2B5C8 18%,var(--surface)))}
 .pastnote-card textarea{width:100%;min-height:96px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);resize:vertical;line-height:1.55;margin:10px 0 12px}
 
+/* Welcome + tour */
+.wel{position:fixed;inset:0;z-index:75;background:radial-gradient(120% 90% at 50% 100%,#3A2A5C 0%,#1A1236 45%,#08061A 100%);color:#F5F1FF;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.wel canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.wel-in{position:relative;z-index:1;width:100%;max-width:520px;margin:auto 0;padding:24px 0}
+.wel-dots{display:flex;gap:6px;margin-bottom:28px}
+.wel-dots i{width:22px;height:4px;border-radius:4px;background:rgba(255,255,255,.2)}
+.wel-dots i.on{background:#F6D98B}
+.wel h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,8vw,52px);line-height:1.1;margin:0 0 14px;color:#fff;text-wrap:balance}
+.wel h2{font-size:clamp(26px,6vw,36px);line-height:1.2;margin:0 0 10px;color:#fff;text-wrap:balance}
+.wel p{font-size:18px;line-height:1.55;color:#E4DCF5;margin:0 0 18px;max-width:40ch}
+.wel .field span{color:#CFC6EA}
+.wel .field input,.wel select,.wel .freq input[type=number]{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:14px}
+.wel .field input::placeholder{color:rgba(255,255,255,.45)}
+.wel .fdays label{border-color:rgba(255,255,255,.3)}
+.wel .fdays label:has(input:checked){background:#F6D98B;color:#241B3F;border-color:#F6D98B}
+.wel .freq>span{color:#CFC6EA}
+.wel .btn{background:#F6D98B;color:#241B3F}
+.wel .btn.ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45)}
+.wel .chips{margin:-4px 0 16px}
+.wel .chip{background:rgba(255,255,255,.1);color:#fff;border:0;cursor:pointer;font:inherit;font-size:15px}
+.wel .skip{background:none;border:0;color:#CFC6EA;cursor:pointer;font:inherit;font-size:15px;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.wel .firststep{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.07);border-radius:18px;padding:16px 18px;margin:6px 0 18px}
+.wel .firststep b{font-weight:500;font-size:18px}
+.wel .firststep small{display:block;color:#CFC6EA;font-size:14px}
+.tour-block{position:fixed;inset:0;z-index:62}
+.tour-spot{position:absolute;border-radius:18px;box-shadow:0 0 0 9999px rgba(8,6,26,.72),0 0 0 3px #F6D98B;transition:all .35s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.tour-card{position:fixed;z-index:66;width:min(360px,calc(100vw - 32px));background:#221A3E;color:#F5F1FF;border-radius:20px;padding:18px 18px 14px;box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.1);transition:top .35s,left .35s}
+.tour-card small{color:#E9D9A6;font-size:13px}
+.tour-card h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:4px 0 6px;line-height:1.3}
+.tour-card p{margin:0 0 14px;color:#DCD3F2;font-size:16px;line-height:1.5}
+.tour-card .row{gap:8px;justify-content:space-between}
+.tour-card .btn{background:#F6D98B;color:#241B3F;padding:9px 16px}
+.tour-card .btn.ghost{background:transparent;color:#CFC6EA;padding:9px 6px}
+.tour-pill{position:fixed;z-index:67;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:#F2B5C8;color:#241B3F;font-size:13px;font-weight:600;border-radius:999px;padding:5px 14px;pointer-events:none;white-space:nowrap}
+@media (prefers-reduced-motion: reduce){.tour-spot,.tour-card{transition:none}}
+
 /* Star shapes */
 .star-preview{background:linear-gradient(180deg,#141030,#2E2352);border-radius:16px;margin:12px 0 4px;padding:6px 0}
 .star-preview svg{display:block;width:100%;max-width:420px;margin:0 auto}
@@ -634,6 +670,7 @@ const EMPTY=()=>({name:"",categories:[],priorities:[],tasks:[],checkpoints:[],mi
 S=EMPTY();
 let tab="home",filter="all",bornKey=null,noteFor=null,addingP=false,editingP=null,newColor=COLORS[0],scrollTo=null;
 let msAdding=false,msEditing=null,retryFor=null,photoFilter="all",pending=null,comparing=false,compareSel=[],organizing=false,orgSel=[],editingPhoto=null;
+let tour=null,welcome=null;
 let photosUnlocked=false,hiddenAt=0,pinBusy=false,privPanel=false,pendingPriv=null,afterUnlock=null;
 let editingTask=null,shootNext=false,lastReport=null,conAnim=null,reflectSec="checkpoint";
 let dbRef=null,assetsNS=null,curSky=null,desk=window.proofDesktop||null,deskSettings=null;
@@ -726,6 +763,7 @@ function migrate(){
   S.photos.forEach(ph=>{if(ph.cat===undefined)ph.cat=null});
   S.settings=S.settings||{skyMode:"time"};
   S.photoPrivacy=S.photoPrivacy||{};
+  if(S.onboarded===undefined)S.onboarded=!!(S.priorities.length||S.tasks.length);
   if(!S.settings.privacyV2){
     const hadLock=S.settings.photoLock&&S.settings.photoLock.hash;
     S.photos.forEach(ph=>{if(!ph.privacy){if(hadLock)ph.privacy="lock";else if(S.settings.photoBlur)ph.privacy="blur"}});
@@ -786,6 +824,7 @@ function score(t){
 function loadLocal(){try{const r=localStorage.getItem("proof-state");if(r)S=Object.assign(EMPTY(),JSON.parse(r))}catch(e){}}
 let saveTimer=null,saving=Promise.resolve();
 function persist(){
+  if(tour)return; // the tour runs on a sample sky that is never saved
   try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
@@ -805,7 +844,7 @@ async function connect(){
     const ref=db.doc("data/users/"+id+"/sky");
     const snap=await ref.get();
     dbRef=ref;
-    if(snap.exists){S=Object.assign(EMPTY(),JSON.parse(JSON.stringify(snap.data())));migrate();render();persist()}
+    if(snap.exists){const loaded=Object.assign(EMPTY(),JSON.parse(JSON.stringify(snap.data())));if(tour){tour.real=loaded}else{S=loaded;migrate();if(welcome&&(S.priorities.length||S.onboarded))closeWelcome(true);render();persist()}}
     else if(S.priorities.length||S.tasks.length)persist();
     $("#syncState").textContent="Saved to your account, on every device";
   }catch(e){}
@@ -833,6 +872,7 @@ async function shrink(file){
   return await new Promise(r=>c.toBlob(r,"image/jpeg",.86));
 }
 async function storePhoto(id,blob){
+  if(tour)throw new Error("tour");
   if(assetsNS){const r=await assetsNS.upload(blob);return{asset:r.id,url:r.url}}
   await IDB.put(id,blob);photoURLs[id]=URL.createObjectURL(blob);return{};
 }
@@ -1748,6 +1788,7 @@ function storyClick(e){
   if(b){const a=b.dataset.act;
     if(a==="story-close"){closeStory();return true}
     if(a==="story-mode"){startRemind(b.dataset.id);return true}
+    if(tour&&(a==="story-promise"||a==="story-smaller")){closeStory();return true}
     if(a==="story-promise"){closeStory(true);if(!S.priorities.length){addingP=true;goTab("priorities")}else{goTab("priorities");setTimeout(()=>{const f=document.querySelector(".addstep");if(f){f.classList.add("open");f.scrollIntoView({block:"center"});f.elements.t.focus()}},60)}return true}
     if(a==="story-smaller"){closeStory(true);if(!isHard())S.hardDays[ymd()]=newHardPick();persist();goTab("home");toast("Okay. Today we go gently.");return true}
     if(a==="storyphotos"){S.settings=Object.assign({},S.settings,{storyPhotos:b.checked});persist();toast(b.checked?"Your visible photos can appear in reminders now.":"Photos won't appear in reminders.");return true}
@@ -1759,6 +1800,151 @@ function storyClick(e){
   return true;
 }
 addEventListener("resize",()=>{if(story)sizeStory()});
+
+/* ---------- sample sky for the tour ---------- */
+function sampleState(){
+  const now=Date.now(),R=seed=>rnd("tour"+seed),at=(d,h)=>now-d*DAY-(h||3)*3600000;
+  const P=[{id:"sp1",title:"My health",belief:"moves with love",color:"#F6D98B",cat:null,constellation:"The Walker"},
+    {id:"sp2",title:"My art",belief:"makes something every week",color:"#F2B5C8",cat:null,constellation:"The Maker"},
+    {id:"sp3",title:"My peace",belief:"is gentle with myself",color:"#A9D8C8",cat:null}];
+  const T=[{id:"st1",pid:"sp1",title:"Go for a walk",tiny:"Put on your shoes",p:.42},{id:"st2",pid:"sp1",title:"Drink water",p:.5},
+    {id:"st3",pid:"sp2",title:"Sketch for 20 minutes",tiny:"Draw one line",p:.28,freq:{type:"weekly",times:3}},
+    {id:"st4",pid:"sp3",title:"Journal before bed",tiny:"Write one sentence",p:.32},{id:"st5",pid:"sp3",title:"Phone off by 11",p:.3,freq:{type:"days",days:[0,1,2,3,4]}}];
+  const notes={st1:["I didn't want to go, but I went anyway.","The air felt really good today."],st4:["Wrote about the day. Felt lighter after."],st3:["Drew the view from my window."]};
+  const tasks=T.map(t=>{const log=[];for(let d=1;d<=118;d++){if(d>=52&&d<=63)continue;if(R(t.id+d)<t.p){const l={at:at(d,2+R("h"+t.id+d)*8),note:""};if(t.tiny&&R("tiny"+t.id+d)<.12)l.tiny=true;log.push(l)}}
+    (notes[t.id]||[]).forEach((n,i)=>{if(log[5+i*9])log[5+i*9].note=n});
+    if(t.id==="st2")log.push({at:now-2*3600000,note:""});
+    return {id:t.id,pid:t.pid,title:t.title,tiny:t.tiny||"",kind:"regular",freq:t.freq||{type:"daily"},log:log.sort((a,b)=>a.at-b.at),todayOn:null,created:at(119)}});
+  const set=JSON.parse(JSON.stringify(S.settings||{}));delete set.photoLock;set.storyPhotos=false;set.privacyV2=true;
+  return Object.assign(EMPTY(),{name:"",seeded:true,onboarded:true,settings:set,priorities:P,tasks,
+    wins:[{id:"sw1",at:at(9),text:"I asked for help instead of pushing through alone",pid:null},{id:"sw2",at:at(34),text:"I rested without feeling guilty",pid:"sp3"},{id:"sw3",at:at(70),text:"I said no to something that wasn't good for me",pid:null}],
+    rests:[{at:at(58)},{at:at(22)}],
+    milestones:[{id:"sm1",title:"Walk 5k without stopping",why:"I want to feel strong in my own body.",date:ymd(now-20*DAY),pid:"sp1",status:"achieved",achievedAt:at(20),attempts:[{due:ymd(now-45*DAY),outcome:"retry",at:at(45),note:"Smaller steps, more rest."},{due:ymd(now-20*DAY),outcome:"achieved",at:at(20)}]},
+      {id:"sm2",title:"Fill my sketchbook",why:"",date:ymd(now+25*DAY),pid:"sp2",status:"active",attempts:[]}],
+    checkpoints:[{id:"sc1",date:at(30),count:40,items:[],proved:"I can keep small promises to myself, even on busy weeks.",hard:"The two weeks I stopped completely.",forward:"Tiny versions on low days."}],
+    pastNotes:[{id:"sn1",text:"Hey. You've come back before, and you can do it again. Just go outside for five minutes.",at:at(10)}],
+    letters:[{id:"sl1",text:"",created:at(15),cond:"hard",opened:false}],remindRecent:[],storySeen:{}});
+}
+
+/* ---------- guided tour ---------- */
+const TOUR=[
+  {tab:"home",sel:".sky-wrap",kick:"Your sky",title:"Every promise you keep becomes a star.",body:"Each priority gets its own colour, and its stars join into a constellation you can name. This sample sky is about four months of someone showing up."},
+  {tab:"home",sel:".today-card",kick:"Today",title:"Small steps, not a to-do list.",body:"Steps can be every day, certain days, or a few times a week. On low-energy days, the tiny version still earns a star."},
+  {tab:"home",sel:'.hard-link [data-act="hardon"]',kick:"Hard days",title:"Proof gets gentle when you need it.",body:"Having a hard day? Today shrinks to one tiny thing, rest counts as showing up, and Proof shows you your own evidence."},
+  {tab:"home",sel:'.hard-link [data-act="remind"]',kick:"Remind me",title:"When you stop believing in yourself, Proof shows you evidence.",body:"Your own comebacks, notes and proud moments, picked fresh each time.",action:"remind",actionLabel:"Play a sample reminder"},
+  {tab:"progress",sel:".rise",kick:"Progress",title:"No streaks to lose.",body:"Missing a day never breaks anything. Every time you come back, Proof counts it as a comeback."},
+  {tab:"progress",unit:"year",sel:'[data-act="yearstory"]',kick:"Your Year in Proof",title:"At the end of the year, your whole sky.",body:"A short story of every time you showed up. No grades, no comparisons.",action:"year",actionLabel:"Watch a preview"},
+  {tab:"home",sel:null,kick:"That's Proof",title:"This could be your sky.",body:"Everything you just saw was a sample. Your own sky starts with one small promise.",final:true}
+];
+function startTour(){
+  if(tour)return;closeModal();closeWelcome(true);
+  tour={real:S,step:0,prevTab:tab,prevProg:prog};S=sampleState();filter="all";
+  const el=document.createElement("div");el.innerHTML=`<div class="tour-block" aria-hidden="true"><div class="tour-spot"></div></div><div class="tour-pill">Tour: this is a sample sky</div><div class="tour-card" role="dialog" aria-live="polite"></div>`;
+  tour.el=el;document.body.appendChild(el);
+  tourGo(0);
+}
+function tourGo(i){
+  tour.step=i;const st=TOUR[i];
+  if(st.unit)prog={unit:st.unit,offset:0};
+  tab=st.tab;render();
+  const tg=st.sel&&document.querySelector(st.sel);
+  if(tg)tg.scrollIntoView({block:"center",behavior:"auto"});else window.scrollTo(0,0);
+  const card=tour.el.querySelector(".tour-card");
+  card.innerHTML=`<small>${st.kick} · ${i+1} of ${TOUR.length}</small><h3>${st.title}</h3><p>${st.body}</p>
+    ${st.action?`<p style="margin:-4px 0 12px"><button class="btn" data-tour="${st.action}">${st.actionLabel}</button></p>`:""}
+    <div class="row">${st.final?`<button class="btn" data-tour="own">${tour.real.priorities.length?"Back to my sky":"Start my own sky"}</button>`:`<button class="btn ghost" data-tour="exit">Exit tour</button><span class="row" style="gap:6px">${i?`<button class="btn ghost" data-tour="back">Back</button>`:""}<button class="btn" data-tour="next">Next</button></span>`}</div>`;
+  requestAnimationFrame(tourPlace);
+  card.querySelector('[data-tour="next"],[data-tour="own"]')?.focus({preventScroll:true});
+}
+function tourPlace(){
+  if(!tour)return;const st=TOUR[tour.step],spot=tour.el.querySelector(".tour-spot"),card=tour.el.querySelector(".tour-card");
+  const tg=st.sel&&document.querySelector(st.sel),vw=innerWidth,vh=innerHeight,cw=card.offsetWidth,ch=card.offsetHeight;
+  if(!tg){spot.style.cssText="left:50%;top:50%;width:0;height:0";card.style.left=Math.max(16,(vw-cw)/2)+"px";card.style.top=Math.max(16,(vh-ch)/2)+"px";return}
+  const r=tg.getBoundingClientRect(),pad=8,top=Math.max(4,r.top-pad),h=Math.min(r.height+pad*2,vh-top-4);
+  spot.style.cssText=`left:${r.left-pad}px;top:${top}px;width:${r.width+pad*2}px;height:${h}px`;
+  let y=top+h+14;if(y+ch>vh-12)y=top-ch-14;if(y<12)y=Math.max(12,vh-ch-16);
+  card.style.left=Math.min(Math.max(16,r.left+r.width/2-cw/2),vw-cw-16)+"px";card.style.top=y+"px";
+}
+function endTour(toOwn){
+  if(!tour)return;const t=tour;tour=null;t.el.remove();closeStory(true);
+  S=t.real;prog=t.prevProg||prog;tab="home";migrate();render();window.scrollTo(0,0);
+  if(!S.priorities.length&&(toOwn||!S.onboarded)){S.onboarded=false;openWelcome(1)}
+  else toast("Back to your own sky.");
+}
+document.addEventListener("click",e=>{
+  if(!tour)return;const b=e.target.closest("[data-tour]");if(!b)return;e.stopImmediatePropagation();
+  const a=b.dataset.tour;
+  if(a==="next")tourGo(Math.min(TOUR.length-1,tour.step+1));
+  else if(a==="back")tourGo(Math.max(0,tour.step-1));
+  else if(a==="exit")endTour(false);
+  else if(a==="own")endTour(true);
+  else if(a==="remind")startRemind("normal");
+  else if(a==="year")openYear(new Date().getFullYear());
+},true);
+addEventListener("resize",()=>{if(tour)tourPlace()});
+addEventListener("scroll",()=>{if(tour)tourPlace()},{passive:true});
+
+/* ---------- welcome for new people ---------- */
+function openWelcome(step){
+  if(tour)return;welcome={step:step||0,name:S.name||"",title:"",belief:"",pid:null,tid:null};
+  const el=document.createElement("div");el.className="wel";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","Welcome to Proof");
+  el.innerHTML=`<canvas aria-hidden="true"></canvas><div class="wel-in"></div>`;document.body.appendChild(el);document.body.style.overflow="hidden";
+  welcome.el=el;welDraw();welStep(welcome.step);
+}
+function closeWelcome(silent){if(!welcome)return;cancelAnimationFrame(welcome.raf);welcome.el.remove();document.body.style.overflow="";welcome=null;if(!silent)render()}
+function welDraw(){
+  const w=welcome;if(!w)return;const c=w.el.querySelector("canvas"),d=Math.min(2,devicePixelRatio||1),W=innerWidth,H=innerHeight;
+  if(c.width!==W*d){c.width=W*d;c.height=H*d}const x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
+  const t=performance.now()/1000,reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  for(let i=0;i<90;i++){x.globalAlpha=.1+.3*rnd("wd"+i)*(reduce?1:.7+.3*Math.sin(t+i));x.fillStyle="#fff";x.beginPath();x.arc(rnd("wx"+i)*W,rnd("wy"+i)*H,.4+rnd("wr"+i)*1,0,7);x.fill()}
+  x.globalAlpha=1;if(!reduce)w.raf=requestAnimationFrame(welDraw);
+}
+function welStep(n){
+  const w=welcome;w.step=n;const box=w.el.querySelector(".wel-in"),dots=`<div class="wel-dots" aria-hidden="true">${[0,1,2,3,4].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</div>`;
+  const P=S.priorities.find(p=>p.id===w.pid),T0=S.tasks.find(t=>t.id===w.tid);
+  const views=[
+    `${dots}<h1>Welcome to Proof.</h1><p>A kind place to keep small promises to yourself. Every one you keep becomes a star, and over time your sky fills with evidence of who you are.</p>
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button></div>`,
+    `${dots}<h2>What should Proof call you?</h2><p>Just a first name or a nickname. You can skip this.</p>
+      <form data-welform="name"><label class="field"><span>Your name</span><input name="name" maxlength="40" value="${esc(w.name)}" autocomplete="given-name"></label>
+      <div class="row"><button class="btn" type="submit">Next</button><button class="skip" type="button" data-wel="skipname">Skip</button></div></form>`,
+    `${dots}<h2>What matters to you right now?</h2><p>Pick one thing. You can add more later.</p>
+      <form data-welform="priority"><label class="field"><span>Something that matters</span><input name="title" required maxlength="60" value="${esc(w.title)}" placeholder="My health"></label>
+      <div class="chips">${["My health","My creativity","My peace","My people","My work"].map(c=>`<button type="button" class="chip" data-wel="chip" data-v="${c}">${c}</button>`).join("")}</div>
+      <label class="field"><span>Finish the sentence: I am someone who…</span><input name="belief" maxlength="120" value="${esc(w.belief)}" placeholder="moves with love"></label>
+      <div class="row"><button class="btn" type="submit">Next</button></div></form>`,
+    `${dots}<h2>One small step for ${esc(P?P.title.replace(/^my /i,"your "):"it")}.</h2><p>Make it small enough to do on a hard day.</p>
+      <form data-welform="step"><label class="field"><span>A small step</span><input name="t" required maxlength="140" placeholder="Go for a 10 minute walk"></label>
+      <label class="field"><span>Tiny version for low-energy days (optional)</span><input name="tiny" maxlength="140" placeholder="Put on your shoes"></label>
+      ${freqFields({type:"daily"})}
+      <div class="row" style="margin-top:18px"><button class="btn" type="submit">Add my first step</button></div></form>`,
+    `${dots}<h2>Now, keep it.</h2><p>When you've done it, check it off, even if that's right now. That's your first star.</p>
+      ${T0?`<div class="firststep"><span style="font-size:22px" aria-hidden="true">○</span><div><b>${esc(T0.title)}</b>${T0.tiny?`<small>Low energy? Just: ${esc(T0.tiny)}</small>`:""}</div></div>`:""}
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="done">I did it</button>${T0&&T0.tiny?`<button class="btn ghost" data-wel="tinydone">I did the tiny version</button>`:""}<button class="skip" data-wel="later">I'll do it later</button></div>`];
+  box.innerHTML=views[n];box.querySelector("input,button")?.focus({preventScroll:true});
+}
+document.addEventListener("click",e=>{
+  if(!welcome)return;const b=e.target.closest("[data-wel]");if(!b)return;e.stopImmediatePropagation();const a=b.dataset.wel;
+  if(a==="next")welStep(1);
+  else if(a==="tour"){closeWelcome(true);startTour()}
+  else if(a==="skipname")welStep(2);
+  else if(a==="chip"){const f=b.closest("form");f.elements.title.value=b.dataset.v;f.elements.belief.focus()}
+  else if(a==="done"||a==="tinydone"||a==="later"){
+    const t=S.tasks.find(x=>x.id===welcome.tid);S.onboarded=true;closeWelcome(true);tab="home";
+    if(t&&a!=="later"){completeTask(t,a==="tinydone");noteFor=null;persist();render();showSky();toast("That's your first star. Welcome to Proof.")}
+    else{persist();render();toast("Your step is waiting on Home whenever you're ready.")}
+  }
+},true);
+document.addEventListener("submit",e=>{
+  if(!welcome)return;const f=e.target.closest("[data-welform]");if(!f)return;e.preventDefault();e.stopImmediatePropagation();const F=f.elements,k=f.dataset.welform;
+  if(k==="name"){welcome.name=F.name.value.trim();S.name=welcome.name;persist();welStep(2)}
+  else if(k==="priority"){const title=F.title.value.trim();if(!title)return;const belief=F.belief.value.trim().replace(/^i am someone who\s*/i,"");
+    if(welcome.pid){Object.assign(P(welcome.pid),{title,belief})}else{const id=rid();S.priorities.push({id,title,belief,color:COLORS[S.priorities.length%COLORS.length],cat:null,constellation:"",created:Date.now()});welcome.pid=id}
+    welcome.title=title;welcome.belief=belief;persist();welStep(3)}
+  else if(k==="step"){const v=F.t.value.trim();if(!v)return;const t={id:rid(),pid:welcome.pid,title:v,kind:"regular",freq:readFreq(f),tiny:F.tiny.value.trim(),log:[],todayOn:null,created:Date.now()};
+    S.tasks.push(t);welcome.tid=t.id;persist();welStep(4)}
+},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tour&&!story){e.stopImmediatePropagation();endTour(false)}},true);
 
 /* ---------- settings ---------- */
 function viewSettings(){
@@ -1777,6 +1963,7 @@ function viewSettings(){
     <div class="star-preview" aria-hidden="true"><svg viewBox="0 0 300 70">${[["step","#F6D98B",55,3.2*2.2],["win","#FFD3E4",150,4.2*2.2],["ms","#FFF3C9",245,11]].map(([k,c,x,r])=>{const sh=shapeOf(k);const R=k==="ms"?r*SHAPE_SIZE[sh]/2.2:k==="win"?r*SHAPE_SIZE[sh]/1.6:r*SHAPE_SIZE[sh];return `<circle cx="${x}" cy="32" r="${Math.max(10,R*1.6)}" fill="${c}" opacity=".25" filter="url(#pglow)"/>${shapeSVG(sh,x,32,R,c)}<text x="${x}" y="64" text-anchor="middle" font-size="11" fill="#CFC6EA">${k==="step"?"Steps":k==="win"?"Proud moments":"Milestones"}</text>`}).join("")}<defs><filter id="pglow"><feGaussianBlur stdDeviation="4"/></filter></defs></svg></div>
     ${[["step","Everyday steps","#F6D98B"],["win","Proud moments","#FFD3E4"],["ms","Milestones","#FFF3C9"]].map(([k,label,c])=>`<p class="shape-label">${label}</p><div class="shapes" role="group" aria-label="${label} star shape">${Object.entries(SHAPES).map(([sh,name])=>`<button class="shapeopt" data-act="starShape" data-kind="${k}" data-id="${sh}" aria-pressed="${shapeOf(k)===sh}" title="${name}"><svg viewBox="0 0 40 40" aria-hidden="true">${shapeSVG(sh,20,20,sh==="dot"?7:sh==="sparkle"?15:12,c)}</svg><span>${name}</span></button>`).join("")}</div>`).join("")}
   </div>
+  <div class="card"><strong>New to Proof?</strong><p class="t-sub" style="margin:4px 0 12px">Walk through everything Proof can do on a sample sky. Your own stars stay exactly as they are.</p><button class="btn quiet" data-act="tour">Take the tour</button></div>
   <div class="card"><strong>You</strong><label class="field" style="margin:10px 0 0"><span>What should Proof call you?</span><input id="nameIn" value="${esc(S.name)}" placeholder="Your name" maxlength="40"></label></div>`;
   if(desk&&deskSettings){
     const d=deskSettings;
@@ -1846,7 +2033,8 @@ function render(){
   const V={home:viewHome,priorities:viewPriorities,milestones:viewMilestones,photos:viewPhotos,progress:viewProgress,reflect:viewCheckpoints,settings:viewSettings};
   $("#view").innerHTML=(V[tab]||viewHome)();
   if(noteFor){const n=document.querySelector(`[data-note="${noteFor}"]`);n&&n.focus({preventScroll:true})}
-  if(desk&&desk.reportToday){const v=shownDays().has(dIdx(Date.now()));if(v!==lastReport){lastReport=v;try{desk.reportToday(v)}catch(e){}}}
+  if(tour)requestAnimationFrame(tourPlace);
+  if(desk&&desk.reportToday&&!tour){const v=shownDays().has(dIdx(Date.now()));if(v!==lastReport){lastReport=v;try{desk.reportToday(v)}catch(e){}}}
   if(scrollTo){document.getElementById(scrollTo)?.scrollIntoView({behavior:"smooth",block:"start"});scrollTo=null}
 }
 function goTab(t){tab=t;noteFor=null;render();window.scrollTo({top:Math.max(0,$(".sky-wrap").offsetHeight-40),behavior:"smooth"})}
@@ -1890,6 +2078,7 @@ document.addEventListener("click",async e=>{
   if(act==="win"){openWinForm();return}
   if(act==="rsec"){reflectSec=id;render();return}
   if(act==="remind"){closeMenu();openRemind(id);return}
+  if(act==="tour"){closeMenu();startTour();return}
   if(act==="yearstory"){openYear(+id);return}
   if(act==="noteasklater"){S.settings=Object.assign({},S.settings,{noteAskSnooze:Date.now()+14*DAY});persist();render();return}
   if(act==="delpastnote"){if(!confirm("Remove this note?"))return;S.pastNotes=S.pastNotes.filter(n=>n.id!==id);persist();render();return}
@@ -2122,6 +2311,7 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden){hiddenAt=D
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!document.activeElement?.matches?.("input,textarea,select")&&!$("#modal").innerHTML)render()});
 
 loadLocal();migrate();render();connect();
+setTimeout(()=>{if(location.hash==="#tour"){history.replaceState(null,"",location.pathname+location.search);startTour()}else if(!S.onboarded&&!S.priorities.length&&!S.tasks.length&&!tour)openWelcome(0)},dbRef?0:350);
 if(desk)desk.getSettings().then(d=>{deskSettings=d;$("#syncState").textContent="Saved on this computer";if(tab==="settings")render()}).catch(()=>{});
 
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){try{navigator.serviceWorker.register("proof-sw.js").catch(()=>{})}catch(e){}}
