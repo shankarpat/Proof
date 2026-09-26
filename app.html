@@ -1098,8 +1098,8 @@ function accountCard(){
     <p class="t-sub" style="margin:4px 0 12px">We sent a sign-in code to <b>${esc(acctFlow.email)}</b>. It can take a minute, and it's worth checking your spam folder.</p>
     <form data-form="acctcode"><label class="field" style="margin:0 0 12px"><span>Your code</span><input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="123456" required style="max-width:220px;letter-spacing:.2em"></label>
     <div class="row"><button class="btn" type="submit">Sign in</button><button class="btn ghost" type="button" data-act="acctresend">Send a new code</button><button class="btn ghost" type="button" data-act="acctback">Use a different email</button></div></form></div>`;
-  return `<div class="card" id="account"><strong>Sync across your devices</strong>
-    <p class="t-sub" style="margin:4px 0 12px">Sign in with your email to keep your sky on your phone, your computer and the web. There's no password: we'll email you a code. Proof works exactly the same without an account.</p>
+  return `<div class="card" id="account"><strong>Create an account or sign in</strong>
+    <p class="t-sub" style="margin:4px 0 12px">An account keeps your sky on your phone, your computer and the web. Just enter your email. If you're new, Proof creates your account; if you already have one, it signs you in. There's no password: we'll email you a code. Proof works exactly the same without an account.</p>
     <form data-form="acctemail"><label class="field" style="margin:0 0 12px"><span>Your email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com" value="${esc(acctFlow?.email||"")}"></label>
     <button class="btn" type="submit">Email me a code</button></form></div>`;
 }
@@ -1167,7 +1167,7 @@ document.addEventListener("submit",async e=>{
   try{
     const res=await firstSync();
     if(res&&res.choose){syncStatus="";render();openFirstChoice(res.choose);return}
-    render();toast(res==="restored"?"Welcome back. Your sky is here.":"Signed in. Your sky now syncs to your account.");
+    render();toast(res==="restored"?"Welcome back. Your sky is here.":"Your account is ready. Your sky now syncs to it.");
   }catch(err){syncStatus="offline";render();toast("Signed in. Proof will sync as soon as it can reach the internet.")}
 },true);
 setInterval(()=>{
@@ -2198,7 +2198,7 @@ function welStep(n){
   const P=S.priorities.find(p=>p.id===w.pid),T0=S.tasks.find(t=>t.id===w.tid);
   const views=[
     `${dots}<h1>Welcome to Proof.</h1><p>A kind place to keep small promises to yourself. Every one you keep becomes a star, and over time your sky fills with evidence of who you are.</p>
-      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button>${ACCOUNTS?`<button class="btn ghost" data-wel="signin">I already use Proof. Sign in</button>`:""}</div>`,
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:12px"><button class="btn" data-wel="next">Get started</button><button class="btn ghost" data-wel="tour">Take a quick tour first</button>${ACCOUNTS?`<button class="btn ghost" data-wel="signin">Sign in or create an account</button>`:""}</div>`,
     `${dots}<h2>What should Proof call you?</h2><p>Just a first name or a nickname. You can skip this.</p>
       <form data-welform="name"><label class="field"><span>Your name</span><input name="name" maxlength="40" value="${esc(w.name)}" autocomplete="given-name"></label>
       <div class="row"><button class="btn" type="submit">Next</button><button class="skip" type="button" data-wel="skipname">Skip</button></div></form>`,
@@ -2607,7 +2607,7 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden){hiddenAt=D
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!document.activeElement?.matches?.("input,textarea,select")&&!$("#modal").innerHTML)render()});
 
 loadLocal();loadAcct();migrate();render();connect();syncLabel();if(acct)syncNow();
-setTimeout(()=>{if(location.hash==="#tour"){history.replaceState(null,"",location.pathname+location.search);startTour()}else if(!S.onboarded&&!S.priorities.length&&!S.tasks.length&&!tour)openWelcome(0)},dbRef?0:350);
+setTimeout(()=>{if(location.hash==="#account"&&ACCOUNTS){history.replaceState(null,"",location.pathname+location.search);tab="settings";render();const c=$("#account");c&&c.scrollIntoView({block:"center"});document.querySelector('[data-form="acctemail"] input')?.focus()}else if(location.hash==="#tour"){history.replaceState(null,"",location.pathname+location.search);startTour()}else if(!S.onboarded&&!S.priorities.length&&!S.tasks.length&&!tour)openWelcome(0)},dbRef?0:350);
 if(desk)desk.getSettings().then(d=>{deskSettings=d;syncLabel();if(tab==="settings")render()}).catch(()=>{});
 
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){try{navigator.serviceWorker.register("proof-sw.js").catch(()=>{})}catch(e){}}
