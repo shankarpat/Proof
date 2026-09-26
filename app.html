@@ -703,6 +703,57 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
 .xlock{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;padding:8px}
 .daynav{display:flex;justify-content:space-between;gap:10px;margin:6px 0 20px}
 
+/* Studio + Proof+ */
+@keyframes tw2{0%,100%{opacity:.15}50%{opacity:.95}}.tw2{animation:tw2 var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:0}8%{opacity:var(--o,.85)}90%{opacity:var(--o,.85)}100%{transform:translate(var(--dx),var(--fy)) rotate(var(--rot));opacity:0}}
+.fall{transform-box:fill-box;transform-origin:center;animation:fall var(--d) linear infinite;animation-delay:var(--dl)}
+@keyframes ff{0%,100%{transform:translate(0,0);opacity:.15}25%{opacity:1}50%{transform:translate(var(--dx),var(--dy));opacity:.4}75%{opacity:.95}}
+.ff{animation:ff var(--d) ease-in-out infinite;animation-delay:var(--dl)}
+@keyframes shim{to{stroke-dashoffset:-100}}.shimmer{animation:shim 4s linear infinite}
+@keyframes shootloop{0%,86%{transform:translate(0,0);opacity:0}88%{opacity:1}96%{opacity:.8}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+.shootloop{animation:shootloop var(--d) cubic-bezier(.3,.6,.4,1) infinite;animation-delay:var(--dl)}
+@media (prefers-reduced-motion: reduce){.tw,.tw2,.fall,.ff,.shimmer,.shootloop,.drift{animation:none!important}.shootloop{display:none}}
+.plus-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.03em;color:#2A1D44;background:linear-gradient(120deg,#FBE3A6,#F4B8CE,#C9B3F2);border-radius:999px;padding:3px 9px;vertical-align:middle}
+.st-hero{border-radius:26px;padding:22px 22px 20px;margin:0 0 16px;background:radial-gradient(ellipse at 20% 0%,rgba(246,217,139,.35),transparent 60%),linear-gradient(135deg,#231A43,#3B2663);color:#F4EEFF}
+.st-hero h2{margin:0 0 6px;color:#fff}
+.st-hero p{margin:0;color:#DCD2F2}
+.st-hero .taglines{display:grid;gap:4px;margin:12px 0 0;font-family:var(--serif);font-size:18px;color:#fff}
+.st-hero .row{margin-top:16px}
+.st-hero .btn{background:#F6D98B;color:#231A3D}
+.st-hero .btn.ghost{background:transparent;color:#F4EEFF;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+.st-prev{position:sticky;top:8px;z-index:3;border-radius:20px;overflow:hidden;margin:0 0 16px;box-shadow:0 12px 30px rgba(20,10,50,.25);aspect-ratio:16/7;background:#141030}
+.st-prev img{width:100%;height:100%;display:block;object-fit:cover}
+.st-prev span{position:absolute;left:12px;bottom:10px;font-size:12px;color:#fff;background:rgba(10,6,30,.45);padding:3px 9px;border-radius:999px}
+.st-card{background:var(--surface);border-radius:24px;padding:18px 18px 16px;margin:0 0 14px}
+.st-card>strong{display:block;margin-bottom:2px}
+.st-card>.t-sub{margin:0 0 12px}
+.packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.pack{border:0;padding:0;background:none;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.pack i{display:block;aspect-ratio:4/3;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);position:relative;overflow:hidden}
+.pack span{display:block;font-size:14px;font-weight:600;margin-top:5px}
+.pack[aria-pressed="true"] i{box-shadow:0 0 0 3px var(--accent)}
+.stopts{display:flex;flex-wrap:wrap;gap:8px}
+.stopts button{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:9px 13px;cursor:pointer;font:inherit;font-size:14px;color:inherit;display:flex;align-items:center;gap:8px}
+.stopts button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.stopts svg{width:26px;height:26px}
+.lrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.lrow:first-of-type{border-top:0}
+.lrow b{min-width:110px;display:flex;align-items:center;gap:8px}
+.lrow b i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.lrow select{padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font:inherit;font-size:14px;color:inherit}
+.vol{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:14px;color:var(--muted)}
+.vol input{flex:1;accent-color:var(--accent)}
+.exps{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.exps button{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.exps b{display:block;font-size:15px}
+.exps small{color:var(--muted);font-size:13px}
+.plus-list{list-style:none;padding:0;margin:0 0 16px;display:grid;gap:9px}
+.plus-list li{display:grid;grid-template-columns:22px 1fr;gap:8px}
+.plus-list li::before{content:"\2726";color:#C98A3A}
+.plus-price{font-family:var(--serif);font-size:26px;margin:0}
+.plus-note{font-size:14px;color:var(--muted);margin:10px 0 0}
+.plus-line{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 12px}
+
 .acct-choices{display:flex;flex-direction:column;gap:10px}
 .acct-choice{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;padding:14px 16px;cursor:pointer;font:inherit}
 .acct-choice:hover,.acct-choice:focus-visible{border-color:var(--accent)}
@@ -739,6 +790,7 @@ h3.sec{font-family:var(--serif);font-weight:400;font-size:21px;margin:30px 0 12p
   <button class="d-item" data-tab="reflect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.3 5.7L20 11l-5.7 2.3L12 19l-2.3-5.7L4 11l5.7-2.3z"/></svg>Reflect</button>
   <button class="d-item" data-tab="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/><path d="M9 8h5"/></svg>Journal</button>
   <button class="d-item" data-tab="archive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-5 9 5"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9"/><path d="M3 20h18"/></svg>Archive</button>
+  <button class="d-item" data-tab="studio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18.5 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/><path d="M5 16l.6 1.4L7 18l-1.4.6L5 20l-.6-1.4L3 18l1.4-.6z"/></svg>Studio <span class="plus-badge" style="margin-left:auto">PLUS</span></button>
   <hr>
   <button class="d-item" data-act="remind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>Remind me</button>
   <button class="d-item" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
@@ -1228,7 +1280,7 @@ function syncNow(){
         if(!sync.dirty)break;
       }
       await syncPhotos();
-      sync.at=Date.now();saveSync();syncStatus="";
+      sync.at=Date.now();saveSync();syncStatus="";fetchPlus();
     }catch(e){syncStatus=e.message==="signedout"?"":"offline"}
     finally{
       syncing=null;syncLabel();
@@ -1304,7 +1356,7 @@ async function signOut(clear){
   closeModal();
   if(sync.dirty&&!sync.needsFirst){try{await Promise.race([syncNow(),new Promise(r=>setTimeout(r,6000))])}catch(e){}}
   try{await sbReq("/auth/v1/logout",{method:"POST"},false)}catch(e){}
-  acct=null;saveAcct();clearSync();syncStatus="";acctFlow=null;
+  acct=null;saveAcct();clearSync();syncStatus="";acctFlow=null;plus=null;try{localStorage.removeItem("proof-plus")}catch(e){}Sound.sync();drawSky();
   if(clear){
     for(const bid of blobRefs()){try{await IDB.del(bid)}catch(e){}if(photoURLs[bid]){URL.revokeObjectURL(photoURLs[bid]);delete photoURLs[bid]}}
     S=EMPTY();migrate();try{localStorage.setItem("proof-state",JSON.stringify(S))}catch(e){}
@@ -1746,6 +1798,242 @@ document.addEventListener("click",e=>{
   if(act==="arcentry"){tab="journal";jv.jid=null;jv.q="";jv.f={};jv.eid=b.dataset.id;render();return}
 });
 
+
+/* ---------- Proof+ membership ---------- */
+const PLUS={checkout:"",price:"$5 a month"}; // checkout: your Lemon Squeezy checkout link for Proof+
+let plus=null;try{plus=JSON.parse(localStorage.getItem("proof-plus")||"null")}catch(e){}
+const isPlus=()=>!!(acct&&plus&&plus.uid===acct.user.id&&plus.plan==="plus"&&(!plus.until||Date.parse(plus.until)+3*864e5>Date.now()));
+async function fetchPlus(){
+  if(!acct)return;
+  try{const r=await sbReq(`/rest/v1/memberships?select=*&user_id=eq.${acct.user.id}`);const m=r&&r[0];const was=isPlus();
+    plus=m?{uid:acct.user.id,plan:m.plan,until:m.active_until,portal:m.portal_url,status:m.status}:{uid:acct.user.id,plan:"free"};
+    try{localStorage.setItem("proof-plus",JSON.stringify(plus))}catch(e){}
+    if(was!==isPlus()){drawSky();softRender();Sound.sync();if(isPlus())toast("Welcome to Proof+. Your sky is yours to shape.")}}catch(e){}
+}
+let plusPoll=null;
+function openCheckout(){
+  if(!acct){closeModal();tab="profile";render();document.querySelector("#account")?.scrollIntoView({block:"center"});toast("Proof+ lives on your account, so log in or create one first.");return}
+  if(!PLUS.checkout){toast("Proof+ isn't open for sign-ups yet. Check back soon.");return}
+  const u=PLUS.checkout+(PLUS.checkout.includes("?")?"&":"?")+"checkout[custom][user_id]="+encodeURIComponent(acct.user.id)+"&checkout[email]="+encodeURIComponent(acct.user.email);
+  window.open(u,"_blank","noopener");closeModal();toast("Finish in the page that just opened. Proof+ unlocks here as soon as it's done.");
+  clearInterval(plusPoll);let n=0;plusPoll=setInterval(()=>{fetchPlus();if(++n>60||isPlus())clearInterval(plusPoll)},10000);
+}
+function openPlus(){
+  if(isPlus()){openModal(`<div style="padding:6px"><h2 style="margin-top:4px">You're a Proof+ member <span class="plus-badge">\u2726 PLUS</span></h2>
+    <p class="t-sub" style="margin:0 0 14px">Thank you. You're helping keep Proof free and kind for everyone.${plus.until?` ${plus.status==="cancelled"?"Your membership ends":"Renews"} ${fmtDate(Date.parse(plus.until))}.`:""}</p>
+    <div class="row">${plus.portal?`<a class="btn quiet" href="${esc(plus.portal)}" target="_blank" rel="noopener">Manage membership</a>`:""}<button class="btn ghost" data-act="closemodal">Close</button></div></div>`);return}
+  openModal(`<div style="padding:6px"><h2 style="margin-top:4px">Proof+ <span class="plus-badge">\u2726 PLUS</span></h2>
+    <p style="margin:0 0 4px;font-family:var(--serif);font-size:19px">Here is the proof. \u2b50<br>Make the proof yours. \u2728</p>
+    <p class="t-sub" style="margin:8px 0 14px">Everything that helps you show up stays free, always. Proof+ is only about making your sky beautiful.</p>
+    <ul class="plus-list"><li>Ten new sky packs, from Sakura and Ocean to a whole Solar System, plus skies that change with the seasons</li><li>Constellation effects, unique shapes for each promise, and new star styles</li><li>Ambient animations: falling petals, snow, fireflies, shooting stars</li><li>Soft soundscapes to write and reflect with</li><li>Your constellation as a 4K wallpaper, phone wallpaper, poster or animated background</li></ul>
+    <p class="plus-price">${PLUS.price}</p><p class="t-sub" style="margin:2px 0 14px">Cancel whenever you like. If you ever leave, your Studio choices are saved for when you come back.</p>
+    <div class="row"><button class="btn" data-act="plusbuy">${acct?"Join Proof+":"Log in to join"}</button><button class="btn ghost" data-act="closemodal">Maybe later</button></div>
+    <p class="plus-note">No pressure, ever. Your stars are the proof, and they're yours for free.</p></div>`);
+}
+
+/* ---------- Constellation Studio ---------- */
+const PLUS_SKIES={
+  sakura:{name:"Sakura",stops:["#2A1A3E","#6A3B6F","#D58BA8","#F5CCD8"],dust:.5,feat:"sakura",fall:"petal"},
+  ocean:{name:"Ocean",stops:["#021629","#063655","#0C5F80","#3E9DB0"],dust:.8,feat:"ocean",moon:true,fall:"bubble"},
+  solar:{name:"Solar System",stops:["#000006","#07081E","#171238"],dust:1.6,feat:"solar",fall:"dust"},
+  cozy:{name:"Cozy Night",stops:["#170E22","#2F1C37","#553047"],dust:1,feat:"cozy",fall:"snow"},
+  minimal:{name:"Minimalist",stops:["#0D0D12","#14141B"],dust:.25,feat:null,fall:"dust"},
+  retro:{name:"Retro",stops:["#10001F","#35095A","#A02D6B","#F28C4B"],dust:.6,feat:"retro",fall:"dust"},
+  spring:{name:"Spring",stops:["#2B3B6E","#7E8FD0","#C9B8E8","#F3D9E6"],light:true,dust:.1,feat:"meadow",fall:"petal",season:1},
+  summer:{name:"Summer",stops:["#1B1B45","#4A2E6B","#C45E6E","#F4A76B"],dust:.5,feat:"summer",fall:"firefly",season:1},
+  autumn:{name:"Autumn",stops:["#1E1230","#4E2A3E","#A2503A","#E39A4F"],dust:.4,feat:"autumn",fall:"leaf",season:1},
+  winter:{name:"Winter",stops:["#0B1433","#1E3566","#5A7DB5","#BFD4F0"],dust:.7,feat:"winter",fall:"snow",season:1}};
+const SK=k=>SKIES[k]||PLUS_SKIES[k]||SKIES.dusk;
+const LINES={classic:"Classic",glow:"Glow",dashed:"Stitched",shimmer:"Shimmer",aurora:"Aurora"};
+const LAYOUTS={organic:"Scattered",circle:"Circle",heart:"Heart",spiral:"Spiral",wave:"Wave",infinity:"Infinity",mountain:"Mountains",crown:"Crown"};
+const AMBIENT={none:"Still",twinkle:"Twinkling",shooting:"Shooting stars",falling:"Falling petals, snow or leaves",fireflies:"Fireflies"};
+const SOUNDS={off:"Off",rain:"Soft rain",ocean:"Ocean waves",wind:"Night wind",hum:"Warm hum"};
+const PLUS_SHAPES={planet:"Planet",snowflake:"Snowflake",crystal:"Crystal"};
+let studioTry=null;
+function effStudio(){if(isPlus())return S.studio||null;return tab==="studio"&&studioTry?studioTry:null}
+function seasonSky(){const m=new Date().getMonth();return m>=2&&m<=4?"spring":m>=5&&m<=7?"summer":m>=8&&m<=10?"autumn":"winter"}
+function layoutPt(s,t,i,n){const T=Math.PI*2;
+  if(s==="circle"){const a=t*T*(n>2?(n-1)/n:1)-Math.PI/2;return[Math.cos(a),Math.sin(a)]}
+  if(s==="heart"){const a=t*T*(n-1)/n+Math.PI;return[16*Math.sin(a)**3/17,-(13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a))/17]}
+  if(s==="spiral"){const r=.12+.88*t,a=t*T*2.2;return[Math.cos(a)*r,Math.sin(a)*r]}
+  if(s==="wave")return[-1+2*t,.5*Math.sin(t*T*1.5)];
+  if(s==="infinity"){const a=t*T*(n-1)/n,d=1+Math.sin(a)**2;return[Math.cos(a)/d*1.1,Math.sin(a)*Math.cos(a)/d*1.6]}
+  if(s==="mountain"){const u=(t*3)%1;return[-1+2*t,.45-(1-Math.abs(u*2-1))*1.1]}
+  if(s==="crown"){return[-1+2*t,.35-.8*Math.abs(Math.sin(t*Math.PI*3))]}
+  return[0,0]}
+function lineSVG(line,col,animLine,light,pid,style){
+  const P2=line.map(q=>q.x.toFixed(1)+","+q.y.toFixed(1)).join(" "),base=`points="${P2}" fill="none" stroke-linejoin="round" stroke-linecap="round"`;
+  const c=light?"#3A2350":col,op=animLine?(light?.45:.55):(light?.25:.2),anim=animLine?`class="draw" pathLength="1"`:"";
+  if(style==="glow")return `<polyline ${base} stroke="${col}" stroke-opacity=".32" stroke-width="5" filter="url(#glow)"/><polyline ${anim} ${base} stroke="${light?c:"#fff"}" stroke-opacity="${Math.min(.9,op+.3)}" stroke-width="1.2"/>`;
+  if(style==="dashed")return `<polyline ${base} stroke="${c}" stroke-opacity="${op+.25}" stroke-width="1.4" stroke-dasharray="2 6"/>`;
+  if(style==="shimmer")return `<polyline ${anim} ${base} stroke="${c}" stroke-opacity="${op}" stroke-width="1"/><polyline class="shimmer" pathLength="100" ${base} stroke="${light?c:"#fff"}" stroke-opacity=".85" stroke-width="1.7" stroke-dasharray="7 93"/>`;
+  if(style==="aurora"){const id="lg"+String(pid).replace(/\W/g,""),xs=line.map(q=>q.x);return `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${Math.min(...xs).toFixed(1)}" y1="0" x2="${(Math.max(...xs)+1).toFixed(1)}" y2="0"><stop offset="0" stop-color="${col}"/><stop offset=".5" stop-color="#9FF3D1"/><stop offset="1" stop-color="#B9A8FF"/></linearGradient></defs><polyline ${base} stroke="url(#${id})" stroke-opacity=".6" stroke-width="3" filter="url(#glowS)"/><polyline ${anim} ${base} stroke="url(#${id})" stroke-opacity=".95" stroke-width="1.2"/>`}
+  return `<polyline ${anim} ${base} stroke="${c}" stroke-opacity="${op}" stroke-width="${animLine?1.4:1}"/>`;
+}
+function skyFeature(f,W,H,key){
+  const m=Math.min(W,H);let o="";
+  if(f==="sakura"){o+=`<path d="M${-W*.02},${H*.08} C${W*.12},${H*.1} ${W*.2},${H*.2} ${W*.3},${H*.16} M${W*.14},${H*.12} C${W*.17},${H*.24} ${W*.2},${H*.3} ${W*.26},${H*.34}" stroke="#3B1E33" stroke-width="${Math.max(3,m*.012)}" fill="none" stroke-linecap="round" opacity=".9"/>`;
+    for(let i=0;i<16;i++){const t=rnd("sk"+i),x=W*(.02+t*.28),y=H*(.07+rnd("sy"+i)*.26),r=m*(.012+rnd("sr"+i)*.012);o+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${i%3?"#F7C6D6":"#FFE3EC"}" opacity=".95"/>`}}
+  if(f==="ocean"){const w=(y,a,c,op)=>`<path d="M0,${H*y} C${W*.2},${H*(y-a)} ${W*.35},${H*(y+a)} ${W*.55},${H*y} S${W*.85},${H*(y-a)} ${W},${H*y} V${H} H0Z" fill="${c}" opacity="${op}"/>`;
+    o+=`<rect x="${W*.8-m*.02}" y="${H*.72}" width="${m*.04}" height="${H*.28}" fill="#EAF2FF" opacity=".12" filter="url(#soft)"/>`+w(.76,.03,"#0B557A",.8)+w(.84,.025,"#07405E",.9)+w(.92,.02,"#042B42",1)}
+  if(f==="solar"){const px=W*.76,py=H*.3,r=m*.08;
+    o+=`<circle cx="${-W*.02}" cy="${H*.9}" r="${m*.5}" fill="#FFB347" opacity=".18" filter="url(#soft)"/><circle cx="${-W*.02}" cy="${H*.9}" r="${m*.16}" fill="#FFC56B" opacity=".9"/>`;
+    o+=`<ellipse cx="${W*.3}" cy="${H*.75}" rx="${W*.55}" ry="${H*.18}" fill="none" stroke="#fff" stroke-opacity=".08" stroke-dasharray="3 7"/><ellipse cx="${W*.2}" cy="${H*.82}" rx="${W*.36}" ry="${H*.11}" fill="none" stroke="#fff" stroke-opacity=".07" stroke-dasharray="3 7"/>`;
+    o+=`<circle cx="${W*.52}" cy="${H*.6}" r="${m*.025}" fill="#7FB3FF"/><circle cx="${W*.33}" cy="${H*.72}" r="${m*.016}" fill="#E07A5F"/>`;
+    o+=`<circle cx="${px}" cy="${py}" r="${r}" fill="#D9B07C"/><circle cx="${px}" cy="${py}" r="${r}" fill="url(#bg)" opacity=".15"/><ellipse cx="${px}" cy="${py}" rx="${r*1.9}" ry="${r*.45}" fill="none" stroke="#F3DDB4" stroke-width="${m*.012}" opacity=".75" transform="rotate(-18 ${px} ${py})"/>`}
+  if(f==="cozy"){o+=`<path d="M0,${H*.84} C${W*.25},${H*.76} ${W*.5},${H*.86} ${W*.75},${H*.8} S${W},${H*.8} ${W},${H*.8} V${H} H0Z" fill="#1A0F1F"/>`;
+    const hx=W*.68,hy=H*.8,s=m*.1;o+=`<circle cx="${hx}" cy="${hy-s*.35}" r="${s*1.4}" fill="#FFB36B" opacity=".22" filter="url(#soft)"/><path d="M${hx-s*.6},${hy} V${hy-s*.55} L${hx},${hy-s*1.05} L${hx+s*.6},${hy-s*.55} V${hy}Z" fill="#120A16"/><rect x="${hx+s*.3}" y="${hy-s*1.05}" width="${s*.14}" height="${s*.3}" fill="#120A16"/><rect x="${hx-s*.2}" y="${hy-s*.45}" width="${s*.22}" height="${s*.2}" fill="#FFC77D"/><rect x="${hx+s*.1}" y="${hy-s*.45}" width="${s*.22}" height="${s*.2}" fill="#FFB35C"/>`}
+  if(f==="retro"){const cx=W*.5,cy=H*.74,r=m*.2,id="rs"+Math.round(W);
+    o+=`<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE27A"/><stop offset="1" stop-color="#FF5E9C"/></linearGradient><mask id="${id}m"><rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>${[0,1,2,3,4].map(i=>`<rect x="0" y="${cy-r*.1+i*r*.17}" width="${W}" height="${r*.05+i*r*.02}" fill="#000"/>`).join("")}</mask></defs>`;
+    o+=`<circle cx="${cx}" cy="${cy}" r="${r*1.6}" fill="#FF6FA8" opacity=".25" filter="url(#soft)"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${id}g)" mask="url(#${id}m)"/>`;
+    const gy=H*.8;o+=`<rect x="0" y="${gy}" width="${W}" height="${H-gy}" fill="#1B0433"/>`;
+    for(let i=0;i<7;i++){const y=gy+(H-gy)*Math.pow(i/6,1.8);o+=`<line x1="0" y1="${y.toFixed(1)}" x2="${W}" y2="${y.toFixed(1)}" stroke="#FF4FB0" stroke-opacity=".55" stroke-width="1"/>`}
+    for(let i=-8;i<=8;i++)o+=`<line x1="${cx+i*W*.03}" y1="${gy}" x2="${cx+i*W*.2}" y2="${H}" stroke="#FF4FB0" stroke-opacity=".45" stroke-width="1"/>`}
+  if(f==="meadow"){o+=`<path d="M0,${H*.84} C${W*.3},${H*.76} ${W*.55},${H*.86} ${W},${H*.78} V${H} H0Z" fill="#8DBF95"/><path d="M0,${H*.92} C${W*.35},${H*.86} ${W*.6},${H*.95} ${W},${H*.88} V${H} H0Z" fill="#6FA67B"/>`;
+    for(let i=0;i<26;i++)o+=`<circle cx="${(rnd("mf"+i)*W).toFixed(1)}" cy="${(H*(.88+rnd("mg"+i)*.1)).toFixed(1)}" r="${(m*.006+1).toFixed(1)}" fill="${["#FFF","#FFD3E4","#FFE9A8"][i%3]}"/>`}
+  if(f==="summer"){o+=`<ellipse cx="${W*.5}" cy="${H*.92}" rx="${W*.7}" ry="${H*.22}" fill="#FFB36B" opacity=".25" filter="url(#soft)"/><path d="M0,${H*.86} C${W*.2},${H*.8} ${W*.4},${H*.88} ${W*.6},${H*.83} S${W*.9},${H*.8} ${W},${H*.85} V${H} H0Z" fill="#2A1633"/>`}
+  if(f==="autumn"){o+=`<path d="M0,${H*.86} C${W*.3},${H*.79} ${W*.6},${H*.9} ${W},${H*.82} V${H} H0Z" fill="#2E1620"/>`;
+    for(let i=0;i<6;i++){const x=W*(.08+i*.17+rnd("tx"+i)*.05),y=H*(.82+rnd("ty"+i)*.03),r=m*(.035+rnd("tr"+i)*.02);o+=`<rect x="${x-1.5}" y="${y-r*.3}" width="3" height="${r*1.3}" fill="#23101A"/><circle cx="${x}" cy="${y-r*.6}" r="${r}" fill="${["#C8553D","#E08A3C","#B8483A","#D9A441"][i%4]}" opacity=".95"/>`}}
+  if(f==="winter"){o+=`<path d="M0,${H*.84} C${W*.25},${H*.77} ${W*.5},${H*.87} ${W*.75},${H*.8} S${W},${H*.81} ${W},${H*.81} V${H} H0Z" fill="#DCE8F8"/><path d="M0,${H*.93} C${W*.3},${H*.87} ${W*.6},${H*.96} ${W},${H*.9} V${H} H0Z" fill="#F4F8FF"/>`;
+    for(let i=0;i<7;i++){const x=W*(.06+i*.14+rnd("px"+i)*.04),y=H*(.84+rnd("pg"+i)*.04),s=m*(.05+rnd("ps"+i)*.03);o+=`<path d="M${x},${y-s} L${x+s*.42},${y} L${x-s*.42},${y}Z" fill="#20375F" opacity=".9"/>`}}
+  return o;
+}
+function ambientSVG(W,H,amb,key){
+  if(!amb||amb==="none")return "";let o="";const N=i=>rnd(key+"am"+i);
+  if(amb==="twinkle")for(let i=0;i<46;i++)o+=`<circle class="tw2" style="--d:${(2+N(i)*4).toFixed(1)}s;--dl:-${(N(i+99)*6).toFixed(1)}s" cx="${(N(i+1)*W).toFixed(1)}" cy="${(N(i+2)*H*.8).toFixed(1)}" r="${(.7+N(i+3)*1.3).toFixed(2)}" fill="#fff"/>`;
+  if(amb==="shooting")for(let i=0;i<3;i++){const x=W*(.25+N(i)*.6),y=H*(.05+N(i+5)*.2);o+=`<g class="shootloop" style="--d:${14+i*5}s;--dl:${i*4.5}s;--dx:-${(W*.4).toFixed(0)}px;--dy:${(H*.3).toFixed(0)}px"><line x1="${x}" y1="${y}" x2="${x+70}" y2="${y-40}" stroke="#fff" stroke-opacity=".7" stroke-width="1.8" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="2.2" fill="#fff"/></g>`}
+  if(amb==="fireflies")for(let i=0;i<22;i++)o+=`<circle class="ff" style="--d:${(5+N(i)*6).toFixed(1)}s;--dl:-${(N(i+7)*8).toFixed(1)}s;--dx:${((N(i+1)-.5)*60).toFixed(0)}px;--dy:${((N(i+2)-.5)*40).toFixed(0)}px" cx="${(N(i+3)*W).toFixed(1)}" cy="${(H*(.35+N(i+4)*.55)).toFixed(1)}" r="${(1.6+N(i+5)*1.4).toFixed(1)}" fill="#E8FF9C" filter="url(#glowS)"/>`;
+  if(amb==="falling"){const kind=(PLUS_SKIES[key]||{}).fall||"dust";
+    for(let i=0;i<28;i++){const x=N(i)*W,y=N(i+1)*H*.9,d=(9+N(i+2)*10).toFixed(1),dx=((N(i+3)-.3)*W*.25).toFixed(0),s=(1+N(i+4)*1.6);
+      const up=kind==="bubble",st=`--d:${d}s;--dl:-${(N(i+5)*20).toFixed(1)}s;--dx:${up?(dx/4).toFixed(0):dx}px;--fy:${up?-(H*.9).toFixed(0):(H*1.05).toFixed(0)}px;--rot:${(N(i+6)*540-270).toFixed(0)}deg`;
+      const shape=kind==="petal"?`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(3.2*s).toFixed(1)}" ry="${(1.9*s).toFixed(1)}" fill="${i%2?"#F7C6D6":"#FFE3EC"}"/>`
+        :kind==="snow"?`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.3*s).toFixed(1)}" fill="#fff"/>`
+        :kind==="leaf"?`<path d="M${x.toFixed(1)},${y.toFixed(1)} q${(4*s).toFixed(1)},-${(4*s).toFixed(1)} ${(8*s).toFixed(1)},0 q-${(4*s).toFixed(1)},${(4*s).toFixed(1)} -${(8*s).toFixed(1)},0z" fill="${["#E08A3C","#C8553D","#D9A441"][i%3]}"/>`
+        :kind==="bubble"?`<circle cx="${x.toFixed(1)}" cy="${(H*.95).toFixed(1)}" r="${(1.8*s).toFixed(1)}" fill="none" stroke="#CFF3FF" stroke-opacity=".7"/>`
+        :kind==="firefly"?`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.3*s).toFixed(1)}" fill="#E8FF9C" filter="url(#glowS)"/>`
+        :`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(.8*s).toFixed(1)}" fill="#FFE9A8"/>`;
+      o+=`<g class="fall" style="${st};--o:${kind==="snow"?.9:.8}">${shape}</g>`}}
+  return `<g aria-hidden="true">${o}</g>`;
+}
+/* soundscapes, made live in the browser: no files, no network */
+const Sound={ctx:null,out:null,kind:"off",nodes:[],
+  noise(){const c=this.ctx,b=c.createBuffer(1,c.sampleRate*3,c.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;last=(last+.02*w)/1.02;d[i]=last*3.5}const s=c.createBufferSource();s.buffer=b;s.loop=true;return s},
+  lfo(freq,depth,target,base){const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.frequency.value=freq;g.gain.value=depth;o.connect(g);g.connect(target);if(base!=null)target.value=base;o.start();this.nodes.push(o);return o},
+  start(kind,vol){
+    this.stop();if(!kind||kind==="off")return;
+    try{this.ctx=this.ctx||new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
+    const c=this.ctx;if(c.state==="suspended")c.resume().catch(()=>{});
+    this.out=c.createGain();this.out.gain.value=0;this.out.connect(c.destination);this.out.gain.linearRampToValueAtTime((vol??.5)*.5,c.currentTime+2);
+    if(kind==="hum"){const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=900;const tg=c.createGain();tg.gain.value=.06;f.connect(tg);tg.connect(this.out);
+      [110,164.81,220,277.18].forEach((hz,i)=>{const o=c.createOscillator();o.type=i%2?"triangle":"sine";o.frequency.value=hz;o.detune.value=(i-1.5)*4;const g=c.createGain();g.gain.value=i===3?.35:.6;o.connect(g);g.connect(f);o.start();this.nodes.push(o)});
+      this.lfo(.09,.025,tg.gain)}
+    else{const n=this.noise(),f=c.createBiquadFilter(),g=c.createGain();n.connect(f);f.connect(g);g.connect(this.out);n.start();this.nodes.push(n);
+      if(kind==="rain"){f.type="highpass";f.frequency.value=600;const f2=c.createBiquadFilter();f2.type="lowpass";f2.frequency.value=5200;f.disconnect();f.connect(f2);f2.connect(g);g.gain.value=.5}
+      if(kind==="ocean"){f.type="lowpass";f.frequency.value=520;g.gain.value=.55;this.lfo(.075,.4,g.gain)}
+      if(kind==="wind"){f.type="bandpass";f.Q.value=1.4;f.frequency.value=500;g.gain.value=.7;this.lfo(.05,260,f.frequency)}}
+    this.kind=kind;
+  },
+  stop(){this.nodes.forEach(n=>{try{n.stop()}catch(e){}});this.nodes=[];if(this.out){try{this.out.disconnect()}catch(e){}}this.out=null;this.kind="off"},
+  vol(v){if(this.out&&this.ctx)this.out.gain.setTargetAtTime(v*.5,this.ctx.currentTime,.2)},
+  want(){const es=effStudio();return es&&es.sound&&es.sound!=="off"?es.sound:"off"},
+  sync(){const w=this.want(),es=effStudio()||{};if(document.hidden){this.stop();return}if(w!==this.kind)this.start(w,es.vol??.5)}
+};
+addEventListener("pointerdown",()=>{if(Sound.want()!=="off"&&Sound.kind==="off")Sound.sync()},{capture:true});
+document.addEventListener("visibilitychange",()=>Sound.sync());
+function studioSet(k,v,sub){
+  const cur=isPlus()?(S.studio=S.studio||{}):(studioTry=studioTry||{});
+  if(sub){cur[k]=Object.assign({},cur[k],{[sub]:v})}else cur[k]=v;
+  if(k==="sky")cur.season=false;
+  if(isPlus())persist();
+  drawSky();Sound.sync();if(k!=="vol")render();
+}
+function previewURL(){
+  const [W,H]=[720,315];const keep=[bornKey,conAnim,shootNext];bornKey=null;conAnim=null;shootNext=false;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${skyMarkup(W,H)}</svg>`;[bornKey,conAnim,shootNext]=keep;
+  return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+}
+function shapeBtn(kind,sh,sel,col){return `<button data-act="st" data-k="shapes" data-sub="${kind}" data-v="${sh}" aria-pressed="${sel===sh}" title="${SHAPES[sh]||PLUS_SHAPES[sh]}"><svg viewBox="0 0 40 40" aria-hidden="true">${shapeSVG(sh,20,20,sh==="dot"?7:12,col)}</svg>${SHAPES[sh]||PLUS_SHAPES[sh]}</button>`}
+function viewStudio(){
+  const es=effStudio()||{},p=isPlus(),cur=activeSky();
+  const grad=k=>`linear-gradient(180deg,${SK(k).stops.join(",")})`;
+  let h=`<div class="st-hero"><h2>Constellation Studio <span class="plus-badge">\u2726 PLUS</span></h2>
+    <div class="taglines"><span>Here is the proof. \u2b50</span><span>Make the proof yours. \u2728</span></div>
+    ${p?`<p style="margin-top:10px">Everything you choose here saves to your sky on every device.</p>`:`<p style="margin-top:10px">You're previewing. Tap anything and watch your sky change. To keep it, join Proof+ for ${PLUS.price}. Your proof itself is always free.</p><div class="row"><button class="btn" data-act="plus">Join Proof+</button>${studioTry?`<button class="btn ghost" data-act="sttryreset">Back to my sky</button>`:""}</div>`}</div>
+    <div class="st-prev"><img src="${previewURL()}" alt="Preview of your sky with these choices"><span>${esc(SK(cur).name)}</span></div>`;
+  h+=`<div class="st-card"><strong>Sky packs</strong><p class="t-sub">New worlds for your stars. Your free skies stay in Settings.</p><div class="packs">
+    <button class="pack" data-act="st" data-k="sky" data-v="" aria-pressed="${!es.sky&&!es.season}"><i style="background:${grad((SKIES[S.settings&&S.settings.sky]?S.settings.sky:"dusk"))}"></i><span>My free sky</span></button>
+    ${Object.entries(PLUS_SKIES).filter(([,v])=>!v.season).map(([k,v])=>`<button class="pack" data-act="st" data-k="sky" data-v="${k}" aria-pressed="${!es.season&&es.sky===k}"><i style="background:${grad(k)}"></i><span>${v.name}</span></button>`).join("")}</div></div>`;
+  h+=`<div class="st-card"><strong>Seasonal skies</strong><p class="t-sub">Spring, summer, autumn and winter, each with its own sky.</p><div class="packs">
+    <button class="pack" data-act="st" data-k="season" data-v="1" aria-pressed="${!!es.season}"><i style="background:linear-gradient(90deg,${["spring","summer","autumn","winter"].map(k=>SK(k).stops[2]).join(",")})"></i><span>Follow the seasons</span></button>
+    ${Object.entries(PLUS_SKIES).filter(([,v])=>v.season).map(([k,v])=>`<button class="pack" data-act="st" data-k="sky" data-v="${k}" aria-pressed="${!es.season&&es.sky===k}"><i style="background:${grad(k)}"></i><span>${v.name}</span></button>`).join("")}</div></div>`;
+  h+=`<div class="st-card"><strong>Constellation lines</strong><p class="t-sub">How the stars of each promise connect.</p><div class="stopts">${Object.entries(LINES).map(([k,v])=>`<button data-act="st" data-k="line" data-v="${k}" aria-pressed="${(es.line||"classic")===k}">${v}</button>`).join("")}</div></div>`;
+  h+=`<div class="st-card"><strong>Constellation shapes</strong><p class="t-sub">Give each promise its own shape in the sky.</p>${S.priorities.length?S.priorities.map(pr=>`<div class="lrow"><b style="--c:${pr.color}"><i></i>${esc(pr.title)}</b><select data-stlayout="${pr.id}" aria-label="Shape for ${esc(pr.title)}">${Object.entries(LAYOUTS).map(([k,v])=>`<option value="${k}" ${((es.layouts||{})[pr.id]||"organic")===k?"selected":""}>${v}</option>`).join("")}</select></div>`).join(""):`<p class="t-sub" style="margin:0">Add a priority first, and its constellation can take a shape here.</p>`}</div>`;
+  h+=`<div class="st-card"><strong>Star styles</strong><p class="t-sub">Extra shapes, on top of the free ones in Settings.</p>${[["step","Everyday steps","#F6D98B"],["win","Proud moments","#FFD3E4"],["ms","Milestones","#FFF3C9"]].map(([k,l,c])=>`<p class="shape-label">${l}</p><div class="stopts"><button data-act="st" data-k="shapes" data-sub="${k}" data-v="" aria-pressed="${!(es.shapes||{})[k]}">My free style</button>${Object.keys(PLUS_SHAPES).map(sh=>shapeBtn(k,sh,(es.shapes||{})[k],c)).join("")}</div>`).join("")}</div>`;
+  h+=`<div class="st-card"><strong>Ambient animation</strong><p class="t-sub">A little life in your sky. Falling petals, snow or leaves follow the sky you pick.</p><div class="stopts">${Object.entries(AMBIENT).map(([k,v])=>`<button data-act="st" data-k="ambient" data-v="${k}" aria-pressed="${(es.ambient||"none")===k}">${v}</button>`).join("")}</div></div>`;
+  h+=`<div class="st-card"><strong>Soundscape</strong><p class="t-sub">Soft sound while Proof is open. It's made right here in the app, and it pauses when you switch away.</p><div class="stopts">${Object.entries(SOUNDS).map(([k,v])=>`<button data-act="st" data-k="sound" data-v="${k}" aria-pressed="${(es.sound||"off")===k}">${v}</button>`).join("")}</div>
+    <label class="vol">Volume<input type="range" min="0" max="1" step="0.05" value="${es.vol??.5}" data-stvol="1" aria-label="Soundscape volume"></label></div>`;
+  h+=`<div class="st-card"><strong>Take your sky with you</strong><p class="t-sub">Your constellation, exactly as it looks now.</p><div class="exps">
+    <button data-act="stexp" data-id="wall"><b>4K wallpaper</b><small>3840 \u00d7 2160, for your computer</small></button>
+    <button data-act="stexp" data-id="phone"><b>Phone wallpaper</b><small>For your lock screen</small></button>
+    <button data-act="stexp" data-id="poster"><b>Poster</b><small>A4, print-ready, with your name</small></button>
+    <button data-act="stexp" data-id="live"><b>Animated background</b><small>A moving sky you can open full screen or use with wallpaper apps</small></button></div></div>`;
+  return h;
+}
+async function exportSky(kind){
+  if(!isPlus()){openPlus();return}
+  if(kind==="live")return exportLive();
+  const sizes={wall:[3840,2160,3],phone:[1290,2796,3],poster:[2480,3508,3.2]},[W,H,sc]=sizes[kind],Wl=Math.round(W/sc),Hl=Math.round(H/sc);
+  toast("Painting your sky\u2026");
+  const keep=[bornKey,conAnim,shootNext];bornKey=null;conAnim=null;shootNext=false;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${Wl} ${Hl}">${skyMarkup(Wl,Hl,{exp:kind})}</svg>`;[bornKey,conAnim,shootNext]=keep;
+  try{
+    const im=new Image();im.src=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));await im.decode();
+    const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.drawImage(im,0,0,W,H);URL.revokeObjectURL(im.src);
+    if(kind==="poster"){
+      const g=x.createLinearGradient(0,H*.62,0,H);g.addColorStop(0,"rgba(8,5,24,0)");g.addColorStop(1,"rgba(8,5,24,.85)");x.fillStyle=g;x.fillRect(0,H*.6,W,H*.4);
+      await document.fonts.ready;x.textAlign="center";x.fillStyle="#FFF8E6";x.font=`${Math.round(W*.07)}px "Young Serif", Georgia, serif`;
+      x.fillText(S.name?`${S.name}'s sky`:"My sky",W/2,H*.83);
+      const n=allCompletions().length,first=Math.min(...allCompletions().map(c=>c.at),Date.now());
+      x.font=`${Math.round(W*.022)}px "Instrument Sans", system-ui, sans-serif`;x.fillStyle="#E6DDF7";
+      x.fillText(`${plural(n,"promise")} kept since ${new Date(first).toLocaleDateString(undefined,{month:"long",year:"numeric"})}`,W/2,H*.87);
+      const names=S.priorities.filter(p=>p.constellation).map(p=>p.constellation);if(names.length){x.fillStyle="#CFC3EA";x.fillText(names.join("  \u00b7  "),W/2,H*.905)}
+      x.font=`${Math.round(W*.014)}px "Instrument Sans", system-ui, sans-serif`;x.fillStyle="rgba(255,255,255,.55)";x.fillText("Here is the proof.",W/2,H*.955);
+    }
+    const blob=await new Promise(r=>c.toBlob(r,"image/png"));
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`proof-sky-${kind==="wall"?"4k":kind}.png`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    toast("Saved. Your sky is ready to use.");
+  }catch(e){toast("That didn't work this time. Try again in a moment.")}
+}
+function exportLive(){
+  const keep=[bornKey,conAnim,shootNext];bornKey=null;conAnim=null;shootNext=false;
+  const W=1920,H=1080,mk=skyMarkup(W,H,{exp:"live"});[bornKey,conAnim,shootNext]=keep;
+  const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(S.name?S.name+"'s sky":"My sky")} \u00b7 Proof</title><style>html,body{margin:0;height:100%;background:#0A061E;overflow:hidden}svg{position:fixed;inset:0;width:100%;height:100%}@keyframes tw{0%,100%{opacity:1}50%{opacity:.55}}.tw{animation:tw 4s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(3%)}}.drift{animation:drift 24s ease-in-out infinite}
+@keyframes tw2{0%,100%{opacity:.15}50%{opacity:.95}}.tw2{animation:tw2 var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:0}8%{opacity:var(--o,.85)}90%{opacity:var(--o,.85)}100%{transform:translate(var(--dx),var(--fy)) rotate(var(--rot));opacity:0}}
+.fall{transform-box:fill-box;transform-origin:center;animation:fall var(--d) linear infinite;animation-delay:var(--dl)}
+@keyframes ff{0%,100%{transform:translate(0,0);opacity:.15}25%{opacity:1}50%{transform:translate(var(--dx),var(--dy));opacity:.4}75%{opacity:.95}}
+.ff{animation:ff var(--d) ease-in-out infinite;animation-delay:var(--dl)}
+@keyframes shim{to{stroke-dashoffset:-100}}.shimmer{animation:shim 4s linear infinite}
+@keyframes shootloop{0%,86%{transform:translate(0,0);opacity:0}88%{opacity:1}96%{opacity:.8}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+.shootloop{animation:shootloop var(--d) cubic-bezier(.3,.6,.4,1) infinite;animation-delay:var(--dl)}
+@media (prefers-reduced-motion: reduce){.tw,.tw2,.fall,.ff,.shimmer,.shootloop,.drift{animation:none!important}.shootloop{display:none}}</style></head><body><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-label="My sky from Proof">${mk}</svg></body></html>`;
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([html],{type:"text/html"}));a.download="proof-animated-sky.html";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  toast("Saved. Open it full screen, or set it as a live wallpaper with an app like Lively Wallpaper.");
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const act=b.dataset.act;
+  if(act==="plus"){openPlus();return}
+  if(act==="plusbuy"){openCheckout();return}
+  if(act==="st"){const k=b.dataset.k,v=b.dataset.v;
+    if(k==="season"){const cur=isPlus()?(S.studio=S.studio||{}):(studioTry=studioTry||{});cur.season=true;if(isPlus())persist();drawSky();render();return}
+    studioSet(k,v===""?null:v,b.dataset.sub);return}
+  if(act==="sttryreset"){studioTry=null;Sound.sync();drawSky();render();return}
+  if(act==="stexp"){exportSky(b.dataset.id);return}
+});
+document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.stlayout){studioSet("layouts",t.value==="organic"?null:t.value,t.dataset.stlayout)}});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.stvol){const cur=isPlus()?(S.studio=S.studio||{}):(studioTry=studioTry||{});cur.vol=+t.value;Sound.vol(+t.value);clearTimeout(t._pt);t._pt=setTimeout(()=>{if(isPlus())persist()},500)}});
+
 /* ---------- profile (top-right button) ---------- */
 function initialOf(){const n=(S.name||"").trim()||(acct&&acct.user.email)||"";return n?n[0].toUpperCase():""}
 function avatarHTML(){const a=S.profile&&S.profile.avatar;if(a)return `<span class="avatar"><img src="${esc(a)}" alt=""></span>`;const i=initialOf();return i?`<span class="avatar">${esc(i)}</span>`:`<span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.3-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg></span>`}
@@ -1769,6 +2057,7 @@ function viewProfile(){
     <div class="row"><button class="btn quiet" data-act="pickavatar">${has?"Change photo":"Add a profile photo"}</button>${has?`<button class="btn ghost" data-act="rmavatar">Remove photo</button>`:""}</div>
     <p class="t-sub" style="margin:10px 0 0">${acct?"Your photo and name sync to every device where you log in.":"Your photo stays on this device"+(ACCOUNTS?" until you log in.":".")}</p>
   </div>`;
+  if(ACCOUNTS)h+=`<div class="card"><strong>Proof+ <span class="plus-badge">\u2726 PLUS</span></strong><p class="t-sub" style="margin:4px 0 12px">${isPlus()?"You're a member. Thank you for helping keep Proof free for everyone.":"Here is the proof: free, always. Proof+ lets you make it yours, with new skies, effects, sounds and wallpapers."}</p><div class="row"><button class="btn quiet" data-act="goto" data-tab="studio">Open the Studio</button><button class="btn ghost" data-act="plus">${isPlus()?"Membership":"About Proof+"}</button></div></div>`;
   h+=accountCard();
   return h;
 }
@@ -1800,6 +2089,7 @@ const SKIES={
 };
 const SKY_KEYS=Object.keys(SKIES);
 function activeSky(){
+  const es=effStudio();if(es){if(es.season)return seasonSky();if(es.sky&&PLUS_SKIES[es.sky])return es.sky}
   const st=S.settings||{},mode=st.skyMode||"time";
   if(mode==="fixed"&&SKIES[st.sky])return st.sky;
   if(mode==="daily")return SKY_KEYS[dIdx(Date.now())%SKY_KEYS.length];
@@ -1807,7 +2097,7 @@ function activeSky(){
   return h<5?(dIdx(Date.now())%2?"aurora":"midnight"):h<7?"sunrise":h<11?"cotton":h<16?"golden":h<20?"sunset":h<22?"dusk":"midnight";
 }
 function skyBg(key,W,H){
-  const k=SKIES[key];let o=`<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">${k.stops.map((c,i)=>`<stop offset="${(i/(k.stops.length-1)).toFixed(2)}" stop-color="${c}"/>`).join("")}</linearGradient>
+  const k=SK(key);let o=`<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">${k.stops.map((c,i)=>`<stop offset="${(i/(k.stops.length-1)).toFixed(2)}" stop-color="${c}"/>`).join("")}</linearGradient>
     <linearGradient id="scrimg" x1="0" y1="0" x2="0" y2="1"><stop offset=".38" stop-color="${k.light?"#2A1640":"#0A061E"}" stop-opacity="0"/><stop offset="1" stop-color="${k.light?"#2A1640":"#0A061E"}" stop-opacity="${k.light?.5:.45}"/></linearGradient>
     <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${Math.max(14,W/40)}"/></filter>`;
   let body=`<rect width="${W}" height="${H}" fill="url(#bg)"/>`;
@@ -1823,17 +2113,22 @@ function skyBg(key,W,H){
   if(k.sun){const x=W*k.sun.x,y=H*k.sun.y,r=Math.min(W,H)*k.sun.r;
     body+=`<circle cx="${x}" cy="${y}" r="${r*2.6}" fill="${k.sun.c}" opacity=".35" filter="url(#soft)"/><circle cx="${x}" cy="${y}" r="${r}" fill="${k.sun.c}" opacity=".95"/>`}
   if(k.hills)body+=`<path d="M0,${H*.86} C${W*.2},${H*.78} ${W*.38},${H*.84} ${W*.55},${H*.8} S${W*.85},${H*.74} ${W},${H*.82} V${H} H0Z" fill="#3A1C45" opacity=".85"/><path d="M0,${H*.93} C${W*.25},${H*.86} ${W*.5},${H*.95} ${W*.75},${H*.88} S${W},${H*.9} ${W},${H*.9} V${H} H0Z" fill="#200F2C"/>`;
+  if(k.feat)body+=skyFeature(k.feat,W,H,key);
   return {defs:o,body,light:!!k.light};
 }
 
 /* ---------- sky ---------- */
 const SHAPES={dot:"Dot",sparkle:"Sparkle",star:"Star",heart:"Heart",flower:"Flower",diamond:"Diamond",moon:"Moon",clover:"Clover"};
 const SHAPE_SIZE={dot:1,sparkle:2.2,star:2.1,heart:1.6,flower:2.1,diamond:1.9,moon:1.8,clover:2.1};
+Object.assign(SHAPE_SIZE,{planet:1.7,snowflake:2.2,crystal:2}); // Studio star styles
 const DEFAULT_SHAPES={step:"dot",win:"heart",ms:"sparkle"};
-const shapeOf=k=>{const v=(S.settings&&S.settings.starShapes||{})[k];return SHAPES[v]?v:DEFAULT_SHAPES[k]};
+const shapeOf=k=>{const es=effStudio(),pv=es&&es.shapes&&es.shapes[k];if(pv&&PLUS_SHAPES[pv])return pv;const v=(S.settings&&S.settings.starShapes||{})[k];return SHAPES[v]?v:DEFAULT_SHAPES[k]};
 function shapeSVG(shape,x,y,R,fill,cls="",style=""){
   const f=n=>n.toFixed(2),a=`class="${cls}" ${style?`style="${style}"`:""} fill="${fill}"`;
   if(shape==="dot")return `<circle ${a} cx="${f(x)}" cy="${f(y)}" r="${f(R)}"/>`;
+  if(shape==="planet")return `<g ${a}><circle cx="${f(x)}" cy="${f(y)}" r="${f(R*.62)}"/><ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(R*1.15)}" ry="${f(R*.32)}" fill="none" stroke="${fill}" stroke-width="${f(Math.max(.8,R*.16))}" transform="rotate(-20 ${f(x)} ${f(y)})"/></g>`;
+  if(shape==="snowflake"){let d="";for(let i=0;i<6;i++){const t=i*Math.PI/3,ex=x+Math.cos(t)*R,ey=y+Math.sin(t)*R,mx=x+Math.cos(t)*R*.55,my=y+Math.sin(t)*R*.55;d+=`M${f(x)},${f(y)}L${f(ex)},${f(ey)}M${f(mx)},${f(my)}L${f(mx+Math.cos(t+.8)*R*.3)},${f(my+Math.sin(t+.8)*R*.3)}M${f(mx)},${f(my)}L${f(mx+Math.cos(t-.8)*R*.3)},${f(my+Math.sin(t-.8)*R*.3)}`}return `<path ${a.replace(/fill="[^"]*"/,`fill="none" stroke="${fill}"`)} stroke-width="${f(Math.max(.7,R*.14))}" stroke-linecap="round" d="${d}"/>`}
+  if(shape==="crystal"){let d="";for(let i=0;i<6;i++){const t=-Math.PI/2+i*Math.PI/3,r=i%2?R*.62:R;d+=(i?"L":"M")+f(x+Math.cos(t)*r*.8)+","+f(y+Math.sin(t)*r)}return `<path ${a} d="${d}Z"/>`}
   if(shape==="sparkle")return `<path ${a} d="${sparkle(x,y,R)}"/>`;
   if(shape==="star"){let d="";for(let i=0;i<10;i++){const r=i%2?R*.44:R,t=-Math.PI/2+i*Math.PI/5;d+=(i?"L":"M")+f(x+Math.cos(t)*r)+","+f(y+Math.sin(t)*r)}return `<path ${a} d="${d}Z"/>`}
   if(shape==="heart")return `<path ${a} d="M${f(x)},${f(y+R)} C${f(x-1.67*R)},${f(y-.12*R)} ${f(x-.76*R)},${f(y-1.43*R)} ${f(x)},${f(y-.57*R)} C${f(x+.76*R)},${f(y-1.43*R)} ${f(x+1.67*R)},${f(y-.12*R)} ${f(x)},${f(y+R)}Z"/>`;
@@ -1846,9 +2141,12 @@ function shapeSVG(shape,x,y,R,fill,cls="",style=""){
 function sparkle(x,y,R){const r=R*.28;return `M${x},${y-R} L${x+r},${y-r} L${x+R},${y} L${x+r},${y+r} L${x},${y+R} L${x-r},${y+r} L${x-R},${y} L${x-r},${y-r} Z`}
 function drawSky(){
   const svg=$("#sky"),W=svg.clientWidth||800,H=svg.clientHeight||320;
-  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
-  const key=activeSky(),bg=skyBg(key,W,H);curSky=key;
-  let out=`<defs><filter id='glow' x='-200%' y='-200%' width='500%' height='500%'><feGaussianBlur stdDeviation='3.5'/></filter>${bg.defs}</defs>${bg.body}<rect width="${W}" height="${H}" fill="url(#scrimg)"/>`;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);curSky=activeSky();
+  svg.innerHTML=skyMarkup(W,H);bornKey=null;conAnim=null;
+}
+function skyMarkup(W,H,exp){
+  const key=activeSky(),bg=skyBg(key,W,H),ST=effStudio()||{},LH=exp==="phone"?H*1.85:exp==="poster"?H*1.45:exp?H*1.5:H;
+  let out=`<defs><filter id='glow' x='-200%' y='-200%' width='500%' height='500%'><feGaussianBlur stdDeviation='3.5'/></filter><filter id='glowS' x='-200%' y='-200%' width='500%' height='500%'><feGaussianBlur stdDeviation='1.6'/></filter>${bg.defs}</defs>${bg.body}<rect width="${W}" height="${H}" fill="url(#scrimg)"/>`;
   const halo=(x,y)=>bg.light?`<circle cx="${x}" cy="${y}" r="7" fill="#2A1540" opacity=".28" filter="url(#glow)"/>`:"";
   const stepShape=shapeOf("step"),winShape=shapeOf("win"),msShape=shapeOf("ms");
   const byP={};
@@ -1856,15 +2154,17 @@ function drawSky(){
   const usableH=H*.5;
   for(const pid in byP){
     const p=P(pid),col=p?p.color:"#fff";
-    const cx=68+rnd("px"+pid)*(W-136),cy=70+rnd("py"+pid)*Math.max(10,H*.3-60);
+    const cx=68+rnd("px"+pid)*(W-136),cy=70+rnd("py"+pid)*Math.max(10,LH*.3-60);
     const n=byP[pid].length,spread=Math.min(W,H)*(.2+Math.min(.14,n*.004));
     const pts=byP[pid].sort((a,b)=>a.at-b.at).map(c=>{
       const a=rnd("a"+c.key)*Math.PI*2,d=Math.sqrt(rnd("d"+c.key))*spread;
-      return{c,x:Math.max(10,Math.min(W-10,cx+Math.cos(a)*d*1.4)),y:Math.max(10,Math.min(H*.5,cy+Math.sin(a)*d*.8))};
+      return{c,x:Math.max(10,Math.min(W-10,cx+Math.cos(a)*d*1.4)),y:Math.max(10,Math.min(LH*.5,cy+Math.sin(a)*d*.8))};
     });
-    const line=pts.slice(-24);
+    const lay=ST.layouts&&ST.layouts[pid];
+    if(lay&&LAYOUTS[lay]&&lay!=="organic"&&pts.length>2){const n=pts.length,sp=Math.max(40,Math.min(W*.2,spread*1.1));pts.forEach((q,i)=>{const [ux,uy]=layoutPt(lay,i/(n-1),i,n);q.x=Math.max(10,Math.min(W-10,cx+ux*sp*1.25));q.y=Math.max(10,Math.min(LH*.55,cy+uy*sp*.85))})}
+    const line=lay&&lay!=="organic"&&pts.length>2?pts:pts.slice(-24);
     const bornHere=pts.some(q=>q.c.key===bornKey),animLine=(bornHere||conAnim===pid)&&line.length>1;
-    if(line.length>1)out+=`<polyline ${animLine?`class="draw" pathLength="1"`:""} points="${line.map(q=>q.x.toFixed(1)+","+q.y.toFixed(1)).join(" ")}" fill="none" stroke="${bg.light?"#3A2350":col}" stroke-opacity="${animLine?(bg.light?.45:.55):(bg.light?.25:.2)}" stroke-width="${animLine?1.4:1}"/>`;
+    if(line.length>1)out+=lineSVG(line,col,animLine,bg.light,pid,ST.line||"classic");
     if(p&&p.constellation&&pts.length>=2){const top=Math.min(...pts.map(q=>q.y)),mx=pts.reduce((a,q)=>a+q.x,0)/pts.length;
       const nameIn=conAnim===pid||(bornHere&&pts.length===2);
       out+=`<text class="c-name${nameIn?" cname-in":""}" x="${Math.max(40,Math.min(W-40,mx)).toFixed(1)}" y="${Math.max(16,top-12).toFixed(1)}" text-anchor="middle" font-size="12" fill="#fff" opacity=".62">${esc(p.constellation)}</text>`}
@@ -1877,7 +2177,7 @@ function drawSky(){
     });
   }
   S.milestones.filter(m=>m.status==="achieved").forEach(m=>{
-    const x=40+rnd("mx"+m.id)*(W-80),y=26+rnd("my"+m.id)*(H*.42);
+    const x=40+rnd("mx"+m.id)*(W-80),y=26+rnd("my"+m.id)*(LH*.42);
     const isNewM=bornKey==="ms"+m.id;
     if(isNewM)out+=`<circle class="ring" cx="${x}" cy="${y}" r="4" stroke="#FFF3C9"/>${Array.from({length:8},(_,i)=>{const a=i/8*Math.PI*2;return `<circle class="spark" style="--tx:${(Math.cos(a)*26).toFixed(1)}px;--ty:${(Math.sin(a)*26).toFixed(1)}px" cx="${x}" cy="${y}" r="1.8" fill="#FFF3C9"/>`}).join("")}`;
     out+=`<g class="star ${isNewM?"bloom":""}" data-ms="${m.id}" tabindex="0" role="button" aria-label="Milestone: ${esc(m.title)}"><title>Milestone: ${esc(m.title)}</title>
@@ -1885,7 +2185,7 @@ function drawSky(){
       ${shapeSVG(msShape,x,y,11*SHAPE_SIZE[msShape]/2.2,"#FFF3C9","tw")}</g>`;
   });
   S.wins.forEach(w=>{
-    const x=24+rnd("wx"+w.id)*(W-48),y=18+rnd("wy"+w.id)*(H*.46);
+    const x=24+rnd("wx"+w.id)*(W-48),y=18+rnd("wy"+w.id)*(LH*.46);
     const isNew=bornKey==="w"+w.id;
     if(isNew)out+=`<circle class="ring" cx="${x}" cy="${y}" r="3" stroke="#FFD3E4"/>${Array.from({length:8},(_,i)=>{const a=i/8*Math.PI*2;return `<circle class="spark" style="--tx:${(Math.cos(a)*26).toFixed(1)}px;--ty:${(Math.sin(a)*26).toFixed(1)}px" cx="${x}" cy="${y}" r="1.8" fill="#FFE3EE"/>`}).join("")}`;
     out+=`<g class="star ${isNew?"bloom":""}" data-win="${w.id}" tabindex="0" role="button" aria-label="Proud moment: ${esc(w.text)}"><title>Proud of: ${esc(w.text)}</title>
@@ -1895,7 +2195,8 @@ function drawSky(){
   if(shootNext){shootNext=false;const x=W*(.12+Math.random()*.25),y=H*(.06+Math.random()*.12);
     out+=`<defs><linearGradient id="shg" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
     <g class="shoot" style="--dx:${(W*.55).toFixed(0)}px;--dy:${(H*.32).toFixed(0)}px"><line x1="${x}" y1="${y}" x2="${x-90}" y2="${y-52}" stroke="url(#shg)" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="2.6" fill="#fff"/></g>`}
-  svg.innerHTML=out;bornKey=null;conAnim=null;
+  out+=ambientSVG(W,H,ST.ambient,key);
+  return out;
 }
 function headline(){
   const h=new Date().getHours();
@@ -2855,7 +3156,7 @@ function viewSettings(){
   const st=S.settings||{},mode=st.skyMode||"time",cur=activeSky();
   const grad=k=>`linear-gradient(180deg,${SKIES[k].stops.join(",")})`;
   let h=`<h2>Settings</h2><p class="lede">Make Proof feel like yours.</p>
-  <div class="card"><strong>Your sky</strong><p class="t-sub" style="margin:4px 0 0">Showing now: ${SKIES[cur].name}</p>
+  <div class="card"><strong>Your sky</strong><p class="t-sub" style="margin:4px 0 0">Showing now: ${esc(SK(cur).name)}${PLUS_SKIES[cur]?' <span class="plus-badge">\u2726 Studio</span>':""}</p>
     <div class="radios" role="radiogroup" aria-label="How the sky changes">
       <label><input type="radio" name="skymode" value="time" data-act="skymode" ${mode==="time"?"checked":""}><span>Follow the time of day<br><small class="t-sub">Sunrise in the morning, golden hour in the afternoon, sunset in the evening, midnight skies at night.</small></span></label>
       <label><input type="radio" name="skymode" value="daily" data-act="skymode" ${mode==="daily"?"checked":""}><span>A new sky every day</span></label>
@@ -2863,6 +3164,7 @@ function viewSettings(){
     </div>
     <div class="skies">${SKY_KEYS.map(k=>`<button class="skyopt" data-act="pickSky" data-id="${k}" aria-pressed="${mode==="fixed"&&st.sky===k}"><i style="background:${grad(k)}"></i><span>${SKIES[k].name}</span></button>`).join("")}</div>
   </div>
+  <div class="card"><strong>Want more?</strong><p class="t-sub" style="margin:4px 0 12px">Ten more skies, constellation shapes, animations, soundscapes and wallpapers live in the Constellation Studio.</p><button class="btn quiet" data-act="goto" data-tab="studio">Open the Studio \u2728</button></div>
   <div class="card"><strong>Your stars</strong><p class="t-sub" style="margin:4px 0 0">Choose how each kind of star looks in your sky.</p>
     <div class="star-preview" aria-hidden="true"><svg viewBox="0 0 300 70">${[["step","#F6D98B",55,3.2*2.2],["win","#FFD3E4",150,4.2*2.2],["ms","#FFF3C9",245,11]].map(([k,c,x,r])=>{const sh=shapeOf(k);const R=k==="ms"?r*SHAPE_SIZE[sh]/2.2:k==="win"?r*SHAPE_SIZE[sh]/1.6:r*SHAPE_SIZE[sh];return `<circle cx="${x}" cy="32" r="${Math.max(10,R*1.6)}" fill="${c}" opacity=".25" filter="url(#pglow)"/>${shapeSVG(sh,x,32,R,c)}<text x="${x}" y="64" text-anchor="middle" font-size="11" fill="#CFC6EA">${k==="step"?"Steps":k==="win"?"Proud moments":"Milestones"}</text>`}).join("")}<defs><filter id="pglow"><feGaussianBlur stdDeviation="4"/></filter></defs></svg></div>
     ${[["step","Everyday steps","#F6D98B"],["win","Proud moments","#FFD3E4"],["ms","Milestones","#FFF3C9"]].map(([k,label,c])=>`<p class="shape-label">${label}</p><div class="shapes" role="group" aria-label="${label} star shape">${Object.entries(SHAPES).map(([sh,name])=>`<button class="shapeopt" data-act="starShape" data-kind="${k}" data-id="${sh}" aria-pressed="${shapeOf(k)===sh}" title="${name}"><svg viewBox="0 0 40 40" aria-hidden="true">${shapeSVG(sh,20,20,sh==="dot"?7:sh==="sparkle"?15:12,c)}</svg><span>${name}</span></button>`).join("")}</div>`).join("")}
@@ -2934,7 +3236,7 @@ function render(){
   headline();drawSky();updateMe();
   document.querySelectorAll(".tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
   document.querySelectorAll("#drawer [data-tab]").forEach(b=>b.dataset.tab===tab?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
-  const V={home:viewHome,priorities:viewPriorities,milestones:viewMilestones,photos:viewPhotos,progress:viewProgress,reflect:viewCheckpoints,settings:viewSettings,profile:viewProfile,journal:viewJournal,archive:viewArchive};
+  const V={home:viewHome,priorities:viewPriorities,milestones:viewMilestones,photos:viewPhotos,progress:viewProgress,reflect:viewCheckpoints,settings:viewSettings,profile:viewProfile,journal:viewJournal,archive:viewArchive,studio:viewStudio};
   $("#view").innerHTML=(V[tab]||viewHome)();
   if(tab==="journal")hydrateJ();
   if(noteFor){const n=document.querySelector(`[data-note="${noteFor}"]`);n&&n.focus({preventScroll:true})}
@@ -2942,7 +3244,7 @@ function render(){
   if(desk&&desk.reportToday&&!tour){const v=shownDays().has(dIdx(Date.now()));if(v!==lastReport){lastReport=v;try{desk.reportToday(v)}catch(e){}}}
   if(scrollTo){document.getElementById(scrollTo)?.scrollIntoView({behavior:"smooth",block:"start"});scrollTo=null}
 }
-function goTab(t){if(t==="archive"&&tab!=="archive")av={lvl:"life"};if(tab==="journal"&&jv.eid&&t!=="journal")jLeave();if(t==="journal"&&tab!=="journal"){jv.q="";jv.f={}}tab=t;noteFor=null;render();window.scrollTo({top:Math.max(0,$(".sky-wrap").offsetHeight-40),behavior:"smooth"})}
+function goTab(t){const leavingStudio=tab==="studio"&&t!=="studio";if(t==="archive"&&tab!=="archive")av={lvl:"life"};if(tab==="journal"&&jv.eid&&t!=="journal")jLeave();if(t==="journal"&&tab!=="journal"){jv.q="";jv.f={}}tab=t;noteFor=null;if(leavingStudio&&studioTry){studioTry=null;drawSky();Sound.sync()}render();window.scrollTo({top:Math.max(0,$(".sky-wrap").offsetHeight-40),behavior:"smooth"})}
 
 /* ---------- kindness ---------- */
 const WARM=["That counts.","Look at you.","Proof, right there.","One more star.","You did what you said you would.","Showing up, again."];
@@ -2959,8 +3261,8 @@ document.addEventListener("click",async e=>{
   const id=b.dataset.id,act=b.dataset.act;
   if(act==="menu"){openMenu();return}
   if(act==="closemenu"){closeMenu();return}
-  if(act==="skymode"){S.settings=Object.assign({},S.settings,{skyMode:b.value});if(b.value==="fixed"&&!S.settings.sky)S.settings.sky=activeSky();persist();render();return}
-  if(act==="pickSky"){S.settings=Object.assign({},S.settings,{skyMode:"fixed",sky:id});persist();render();toast(`${SKIES[id].name} it is.`);return}
+  if(act==="skymode"){if(S.studio){S.studio.sky=null;S.studio.season=false}S.settings=Object.assign({},S.settings,{skyMode:b.value});if(b.value==="fixed"&&!S.settings.sky)S.settings.sky=activeSky();persist();render();return}
+  if(act==="pickSky"){if(S.studio){S.studio.sky=null;S.studio.season=false}S.settings=Object.assign({},S.settings,{skyMode:"fixed",sky:id});persist();render();toast(`${SKIES[id].name} it is.`);return}
   if(act==="export"){exportBackup();return}
   if(act==="closemodal"){if(b.classList.contains("modal")&&e.target!==b)return;closeModal();render();return}
   if(act==="goto"){if(b.dataset.tab==="priorities"&&!S.priorities.length)addingP=true;goTab(b.dataset.tab);return}
